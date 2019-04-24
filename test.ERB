@@ -1,0 +1,10 @@
+    PRINTL ……　どうしますか？
+			PRINTL [0] そのまま移動する
+				PRINTL [1] 立ち止まる
+                DATAFORM aaa
+                ;TranslatedMark %CALLNAME:ARG%は%NAME(0)%に膝枕をしている。
+                PRINTFORML [ 4] - 本人同行中の場合 : \@ GETBIT(FLAG:皆援交設定,5) ?[同行中本人からお誘いあり]#[同行中本人からお誘いはなし] \@
+                PRINTFORML %"同行中本人からお誘いあり"%
+                PRINTFORML %CALLNAME:TARGET+"は一緒に治していきましょう、と微笑んだ。"%
+                PRINTFORML %CALLNAME:着用者+"の着替え。変更="+TOSTR(変更)%
+                PRINTFORML %下着%
