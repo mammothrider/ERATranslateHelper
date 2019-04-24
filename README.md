@@ -7,7 +7,7 @@ Depandencies: tkinter, configparser, js2py
 
 
 功能：
-1、对选择的ERB文件进行处理，提取所有PRINT和DATAFORM行（一下简称行）。
+1、对选择的ERB文件进行处理，提取所有PRINT和DATAFORM行（以下简称行）。
 
 2、通过百度web翻译接口，对选定行进行翻译。
 
