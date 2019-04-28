@@ -131,6 +131,9 @@ class MainList(tk.Frame):
     def editorWindowClosed(self):
         self.editor = None
 
+    def replaceWindowClosed(self):
+        self.replaceWindow = None
+
     def transAllText(self):
         for k in self.origin:
             if self.core.getTextDictValue(k) == '':
@@ -199,11 +202,13 @@ class MainList(tk.Frame):
     def moveToItem(self, index):
         self.originList.selection_clear(0, 'end')
         self.translateList.selection_clear(0, 'end')
+        x, y = self.scroll.get()
 
         if index and index > -1 and index < self.originList.size():
             self.originList.selection_set(index)
             self.originList.see(index)
             self.translateList.see(index)
+            self.scroll.set(x, y)
         else:
             return
 
