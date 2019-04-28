@@ -208,6 +208,7 @@ class MainList(tk.Frame):
             self.originList.selection_set(index)
             self.originList.see(index)
             self.translateList.see(index)
+            self.numberList.see(index)
             self.scroll.set(x, y)
         else:
             return
