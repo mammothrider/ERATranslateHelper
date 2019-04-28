@@ -47,15 +47,50 @@ class ReplaceWindow(tk.Frame):
         replaceAllButton['command'] = self.replaceAll
 
     def findValue(self):
-        text = self.findText.get(1.0, tk.END)
+        text = self.findText.get(1.0, tk.END).strip()
+        if text == '':
+            return
+
         dir = self.direction.get()
         currentPosition = self.master.getCurrentSelection()
         
-        self.core.findNext(text, currentPosition, dir == 0)
+        next = self.core.findNext( currentPosition, text, dir == 0)
+        if next != currentPosition:
+            self.master.moveToItem(next)
 
     def replaceValue(self):
-        text = self.findText.get(1.0, tk.END)
-        backward = self.direction.get()
+        text = self.findText.get(1.0, tk.END).strip()
+        if text == '':
+            return
+        rep = self.replaceText.get(1.0, tk.END).strip()
 
-    def replaceAll(self, text, target):
-        pass
+        dir = self.direction.get()
+        currentPosition = self.master.getCurrentSelection()
+        
+        #replace data
+        self.core.replaceText(currentPosition, text, rep)
+        
+        #rebuild list and goto current position
+        self.master.refreshList()
+        self.master.moveToItem(currentPosition)
+
+    def replaceAll(self):
+        text = self.findText.get(1.0, tk.END).strip()
+        if text == '':
+            return
+        rep = self.replaceText.get(1.0, tk.END).strip()
+
+        currentPosition = self.master.getCurrentSelection()
+        
+        #replace data
+        while True:
+            self.core.replaceText(currentPosition, text, rep)
+            next = self.core.findNext(currentPosition, text, True)
+            if next == currentPosition:
+                break
+
+            currentPosition = next
+
+        #rebuild list and goto current position    
+        self.master.refreshList()
+        self.master.moveToItem(currentPosition)

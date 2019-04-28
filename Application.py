@@ -4,6 +4,8 @@ from EraTranslator import *
 from MainList import *
 import Config
 
+import pysnooper
+
 class Application:
     
     def __init__(self, core=None):
@@ -104,10 +106,10 @@ class Application:
             print(o, " Not Found")
              
     def getOriginList(self):
-        return self.textDict.keys()
+        return list(self.textDict.keys())
 
     def getTranslatedList(self):
-        return self.textDict.values()
+        return list(self.textDict.values())
 
     def getTextDictValue(self, origin):
         return self.textDict[origin]
@@ -115,11 +117,32 @@ class Application:
     ########################
     ### find and replace ###
     ########################
-    def findNext(text, current, dir):
+    #@pysnooper.snoop()
+    def findNext(self, current, text, dir):
         values = self.getTranslatedList()
-        #reverse find
-        if not dir:
-            values = values[::-1]
+        length = len(values)
+        i = current + 1
+        while i != current:
+            if i >= length or i < 0:
+                i = (i + length)%length
+
+            if text in values[i]:
+                return i
+
+            if dir:
+                i += 1
+            else:
+                i -= 1
+        return current
+
+    def replaceText(self, current, text, rep):
+        keys = self.getOriginList()
+        values = self.getTranslatedList()
+        ori = keys[current]
+        tra = self.getTextDictValue(ori)
+        if text in tra:
+            tra = tra.replace(text, rep)
+        self.setTranslatedText(ori, tra)
 
 
 if __name__ == '__main__':
