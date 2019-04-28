@@ -9,12 +9,12 @@ class Editor(tk.Frame):
         self.frame.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
         self.core = core
-        self.core.editorWindow = self
+        #self.core.editorWindow = self
         
         self.frame.title("Editor")
         x = 600
         y = 50
-        self.frame.geometry("450x300+%d+%d" % (x, y))
+        self.frame.geometry("450x500+%d+%d" % (x, y))
         self.frame.minsize(450, 500)
         
         self.createEditWindowWidgets()
