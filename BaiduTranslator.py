@@ -1,6 +1,5 @@
 import requests
 import json
-import execjs
 import Config
 import time
 import threading
@@ -45,12 +44,11 @@ class BaiduTranslator:
 
     def get_token_gtk(self):
         '''获取token和gtk(用于合成Sign)'''
-        self.session.get(self.root_url)
         resp = self.session.get(self.root_url)
         html_str = resp.content.decode()
         token = re.findall(r"token: '(.*?)'", html_str)[0]
         gtk = re.findall(r"window.gtk = '(.*?)'", html_str)[0]
-        print('gtk: ', gtk)
+        #print('gtk: ', gtk)
         return token,gtk
         
     def generate_sign(self, text):
@@ -101,5 +99,4 @@ if __name__ == '__main__':
     baidu.startLazyTranslator()
     a = "わ、私のことが嫌いになったの"
     baidu.addTranslate(a, print)
-    time.sleep(10)
     
