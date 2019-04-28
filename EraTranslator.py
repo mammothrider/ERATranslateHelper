@@ -5,8 +5,8 @@ import re
 class EraTranslator:
     def __init__(self):
         self.name = ["灵梦", "魔理沙", "八云紫", "红美玲", "AA", "BB", "CC"]
-        self.place = ["庭", "正門", "納屋", "大浴場"]
-        self.placeFind = ["庭院", "正门", "仓库", "大浴场"]
+        self.place = ["正門", "納屋", "大浴場"]
+        self.placeFind = ["正门", "仓库", "大浴场"]
 
         self.translator = BaiduTranslator()
         self.translator.startLazyTranslator()
