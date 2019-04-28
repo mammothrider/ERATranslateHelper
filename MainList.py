@@ -166,11 +166,13 @@ class MainList(tk.Frame):
 
     def refreshList(self):
         index = self.getCurrentSelection()
+        x, y = self.scroll.get()
 
         self.refreshOriginList()
         self.refreshTranslationList()
 
         self.moveToItem(index)
+        self.scroll.set(x, y)
 
     def refreshOriginList(self):
         self.origin = list(self.core.getOriginList())
@@ -202,14 +204,12 @@ class MainList(tk.Frame):
     def moveToItem(self, index):
         self.originList.selection_clear(0, 'end')
         self.translateList.selection_clear(0, 'end')
-        x, y = self.scroll.get()
 
         if index and index > -1 and index < self.originList.size():
             self.originList.selection_set(index)
             self.originList.see(index)
             self.translateList.see(index)
             self.numberList.see(index)
-            self.scroll.set(x, y)
         else:
             return
 
