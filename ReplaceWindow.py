@@ -86,6 +86,7 @@ class ReplaceWindow(tk.Frame):
         rep = self.replaceText.get(1.0, tk.END).strip()
 
         currentPosition = self.master.getCurrentSelection()
+        backPos = currentPosition
         
         #replace data
         while True:
@@ -98,3 +99,4 @@ class ReplaceWindow(tk.Frame):
 
         #rebuild list and goto current position    
         self.master.refreshList()
+        self.master.moveToItem(backPos)
