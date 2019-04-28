@@ -27,6 +27,7 @@ class MainList(tk.Frame):
 
         self.numberList = tk.Listbox(textArea, activestyle = 'none', bg = self.master['bg'], width = 2)
         self.numberList.pack(side = 'left', fill = 'y', )
+        self.numberList['justify'] = tk.RIGHT
 
         self.originList = tk.Listbox(textArea, activestyle = 'none')
         self.originList.pack(side = 'left', fill = 'both', expand = 1)
@@ -166,7 +167,7 @@ class MainList(tk.Frame):
         self.refreshOriginList()
         self.refreshTranslationList()
 
-        self.originList.selection_set(index)
+        self.moveToItem(index)
 
     def refreshOriginList(self):
         self.origin = list(self.core.getOriginList())
@@ -199,7 +200,7 @@ class MainList(tk.Frame):
         self.originList.selection_clear(0, 'end')
         self.translateList.selection_clear(0, 'end')
 
-        if index and index > -1 and index < self.originList.size() - 1:
+        if index and index > -1 and index < self.originList.size():
             self.originList.selection_set(index)
             self.originList.see(index)
             self.translateList.see(index)
