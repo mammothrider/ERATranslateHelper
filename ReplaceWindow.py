@@ -5,6 +5,7 @@ class ReplaceWindow(tk.Frame):
     def __init__(self, master = None, core = None):
         super().__init__(master)
         self.frame = tk.Toplevel(master) #real window
+        self.frame.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
         self.core = core
         #self.core.editorWindow = self
@@ -16,6 +17,11 @@ class ReplaceWindow(tk.Frame):
         self.frame.minsize(450, 300)
         
         self.createEditWindowWidgets()
+
+    def closeWindow(self):
+        self.frame.destroy()
+        self.master.replaceWindowClosed()
+        self.destroy()
 
     def createEditWindowWidgets(self):
         contentArea = tk.Frame(self.frame)
@@ -72,7 +78,6 @@ class ReplaceWindow(tk.Frame):
         
         #rebuild list and goto current position
         self.master.refreshList()
-        self.master.moveToItem(currentPosition)
 
     def replaceAll(self):
         text = self.findText.get(1.0, tk.END).strip()
@@ -93,4 +98,3 @@ class ReplaceWindow(tk.Frame):
 
         #rebuild list and goto current position    
         self.master.refreshList()
-        self.master.moveToItem(currentPosition)
