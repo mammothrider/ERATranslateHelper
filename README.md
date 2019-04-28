@@ -19,3 +19,7 @@ Depandencies: tkinter, configparser, js2py
 5、支持对所有行进行自动翻译。
 
 6、对选定文件夹内的所有文件转码（从SHIFT-JIS到UTF-8 with BOM）
+
+(2019.4.29)
+
+7、增加了查找、替换翻译内容的功能。
