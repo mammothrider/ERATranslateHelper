@@ -121,15 +121,18 @@ class Application:
     def findNext(self, current, text, dir):
         values = self.getTranslatedList()
         length = len(values)
-        i = current + 1 if dir else current - 1
-        while i != current:
-            if i >= length or i < 0:
-                i = (i + length)%length
 
+        i = current + 1 if dir else current - 1
+        i = (i + length)%length
+        
+        while i != current:
             if text in values[i]:
                 return i
 
             i = i + 1 if dir else i - 1
+            if i >= length or i < 0:
+                i = (i + length)%length
+        
         return current
 
     def replaceText(self, current, text, rep):
