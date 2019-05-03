@@ -60,7 +60,7 @@ class ReplaceWindow(tk.Frame):
         dir = self.direction.get()
         currentPosition = self.master.getCurrentSelection()
         
-        next = self.core.findNext( currentPosition, text, dir == 0)
+        next = self.core.findNext(currentPosition, text, dir == 0)
         if next != currentPosition:
             self.master.moveToItem(next)
 
