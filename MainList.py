@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from tkExtensions import *
 from Editor import *
 from ReplaceWindow import *
@@ -12,13 +12,23 @@ class MainList(tk.Frame):
         self.editor = None
         self.replaceWindow = None
 
+        self.master.protocol("WM_DELETE_WINDOW", self.closeWindow)
+
         #window settings
         self.master.title("ERA Translate Helper         Create by Mammothrider")
         self.master.geometry("500x800+30+30")
         
         #create base widgets
         self.createWidgets()
-    
+
+    def closeWindow(self):
+        if not self.core.isEverythingSaved():
+            msg = messagebox.askyesno("Exit", "Do you want to save?")
+            if msg:
+                self.core.saveFile()
+
+        self.master.destroy()
+
     def createWidgets(self):
         textArea = tk.Frame(self.master)
         textArea.pack(side = 'left', fill = 'both', expand = 1)

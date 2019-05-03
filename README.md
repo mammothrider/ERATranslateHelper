@@ -23,3 +23,10 @@ Depandencies: tkinter, configparser, js2py
 (2019.4.29)
 
 7、增加了查找、替换翻译内容的功能。
+
+(2019.5.3)
+
+8、增加了关闭时保存确认。
+
+TODO：
+1、词典
