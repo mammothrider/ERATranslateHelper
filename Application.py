@@ -20,8 +20,8 @@ class Application:
         #contains origin and translated sentence
         self.textDict = {}
 
-        #unsave mark
-        self.unsave = True
+        #saved mark
+        self.saved = True
 
         #translated mark
         self.mark = Config.get('mark', 'value')
@@ -98,8 +98,8 @@ class Application:
                         self.erbFileManager.replaceContent(line, k, k)
             self.erbFileManager.writeFile()
             
-            #set unsave marker
-            self.unsave = False
+            #set saved marker
+            self.saved = True
         except:
             print(self.textDict)
             print(self.originLineNumber)
@@ -109,7 +109,7 @@ class Application:
         if o in self.textDict:
             if self.textDict[o] != t:
                 self.textDict[o] = t
-                self.unsave = True
+                self.saved = False
         else:
             print(o, " Not Found")
              
@@ -123,7 +123,7 @@ class Application:
         return self.textDict[origin]
 
     def isEverythingSaved(self):
-        return self.unsave
+        return self.saved
 
     ########################
     ### find and replace ###

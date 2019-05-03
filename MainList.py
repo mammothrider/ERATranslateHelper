@@ -212,11 +212,13 @@ class MainList(tk.Frame):
         self.translateList.delete(position + 1)
 
     def moveToItem(self, index):
-        self.originList.selection_clear(0, 'end')
-        self.translateList.selection_clear(0, 'end')
-
         if index and index > -1 and index < self.originList.size():
+            #clear selection
+            self.originList.selection_clear(0, 'end')
+            self.translateList.selection_clear(0, 'end')
+            #set new selection
             self.originList.selection_set(index)
+            #goto see new selection
             self.originList.see(index)
             self.translateList.see(index)
             self.numberList.see(index)
