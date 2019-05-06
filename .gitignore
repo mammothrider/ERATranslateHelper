@@ -1,2 +1,6 @@
 *.pyc
 .vs/Translate/v16/.suo
+Application.build
+翻译常用.txt
+python37.dll
+Application.exe
