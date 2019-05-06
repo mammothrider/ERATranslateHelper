@@ -7,7 +7,7 @@ def init():
     global config
     config = configparser.RawConfigParser()
     config.read("config.ini")
-    if not config.sections:
+    if not config.sections():
         raise ValueError("No config file or file is empty.")
 
 def get(section, key):
