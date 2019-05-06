@@ -3,8 +3,9 @@ import json
 import Config
 import time
 import threading
-import js2py
+# import js2py
 import re
+import execjs
 
 class BaiduTranslator:
     def __init__(self):
@@ -36,11 +37,12 @@ class BaiduTranslator:
         token, gtk = self.get_token_gtk()
         self.data['token'] = token
 
-        self.signFunction = js2py.EvalJs()
+        # self.signFunction = js2py.EvalJs()
         with open('baidu.js', encoding='utf8') as f:
             js_data = f.read()
             js_data = re.sub("window\[l\]",'"'+gtk+'"',js_data)
-            self.signFunction.execute(js_data)
+            # self.signFunction.execute(js_data)
+            self.signFunction = execjs.compile(js_data)
 
     def get_token_gtk(self):
         '''获取token和gtk(用于合成Sign)'''
@@ -54,7 +56,8 @@ class BaiduTranslator:
     def generate_sign(self, text):
         """生成sign"""
         # 1. 准备js编译环境
-        sign = self.signFunction.e(text)
+        # sign = self.signFunction.e(text)
+        sign = self.signFunction.call("e", text)
         return sign
 
     #https://zhuanlan.zhihu.com/p/46111212
@@ -99,4 +102,4 @@ if __name__ == '__main__':
     baidu.startLazyTranslator()
     a = "わ、私のことが嫌いになったの"
     baidu.addTranslate(a, print)
-    
+    input()
