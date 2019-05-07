@@ -4,7 +4,7 @@ from EraTranslator import *
 from MainList import *
 import Config
 
-import pysnooper
+#import pysnooper
 
 class Application:
     
@@ -130,14 +130,17 @@ class Application:
     ########################
     #@pysnooper.snoop()
     def findNext(self, current, text, dir):
-        values = self.getTranslatedList()
-        length = len(values)
+        ori = self.getOriginList()
+        trans = self.getTranslatedList()
+        length = len(trans)
 
         i = current + 1 if dir else current - 1
         i = (i + length)%length
         
         while i != current:
-            if text in values[i]:
+            if text in ori[i]:
+                return i
+            elif text in trans[i]:
                 return i
 
             i = i + 1 if dir else i - 1
