@@ -3,9 +3,11 @@ import json
 import Config
 import time
 import threading
-import js2py
 import re
-#import execjs
+# import js2py
+# import execjs
+from pyjsTranslated import pyjsTranslated
+import os
 
 class BaiduTranslator:
     def __init__(self):
@@ -35,14 +37,14 @@ class BaiduTranslator:
         self.session.headers = self.headers
         self.session.get(self.baidu_url)
 
-        token, gtk = self.get_token_gtk()
+        token, self.gtk = self.get_token_gtk()
         self.data['token'] = token
 
-        self.signFunction = js2py.EvalJs()
-        with open('baidu.js', encoding='utf8') as f:
-            js_data = f.read()
-            js_data = re.sub("window\[l\]",'"'+gtk+'"',js_data)
-            self.signFunction.execute(js_data)
+        # self.signFunction = js2py.EvalJs()
+        # with open('baidu.js', encoding='utf8') as f:
+            # js_data = f.read()
+            # js_data = re.sub("window\[l\]",'"'+gtk+'"',js_data)
+            # self.signFunction.execute(js_data)
             #self.signFunction = execjs.compile(js_data)
 
     def get_token_gtk(self):
@@ -56,9 +58,9 @@ class BaiduTranslator:
         
     def generate_sign(self, text):
         """生成sign"""
-        # 1. 准备js编译环境
-        sign = self.signFunction.e(text)
+        # sign = self.signFunction.e(text)
         #sign = self.signFunction.call("e", text)
+        sign = pyjsTranslated.e(text, self.gtk)
         return sign
 
     #https://zhuanlan.zhihu.com/p/46111212
@@ -82,7 +84,7 @@ class BaiduTranslator:
         try:
             return r["trans_result"]["data"][0]['dst']
         except:
-            print("Content Error: ", r)
+            print("Sign Error: ", r)
             print('sign', data['sign'])
             return ''
         
@@ -107,21 +109,26 @@ class BaiduTranslator:
         if not self.translateThread or not self.translateThread.is_alive():
             self.startLazyTranslator()
 
+os.environ["EXECJS_RUNTIME"] = "Node"
+
 if __name__ == '__main__':
     baidu = BaiduTranslator()
     token, gtk = baidu.get_token_gtk()
-    #baidu.startLazyTranslator()
-    #a = "わ、私のことが嫌いになったの"
-    #baidu.addTranslate(a, print)
-    #input()
+    print(gtk)
+    # baidu.startLazyTranslator()
+    # a = "わ、私のことが嫌いになったの"
+    # baidu.addTranslate(a, print)
+    # input()
 
     #sign test
-    #signFunction = js2py.EvalJs()
-    #with open('baidu.js', encoding='utf8') as f:
-    #        js_data = f.read()
-    #        js_data = re.sub("window\[l\]",'"'+gtk+'"',js_data)
-    #        signFunction.execute(js_data)
-    #        execjsSign = execjs.compile(js_data)
-    #word = "「・・正気なの！？ 灵梦が何を考えているのかわかんないよ・・でも、そうまで言うなら努力するよ」"
-    #print(execjsSign.call('e',word))
-    #print(signFunction.e(word))
+    # print(execjs.get().name)
+    # signFunction = js2py.EvalJs()
+    # with open('baidu.js', encoding='utf8') as f:
+           # js_data = f.read()
+           # signFunction.execute(js_data)
+           # execjsSign = execjs.compile(js_data)
+    # word = "「・・正気なの！？ 灵梦が何を考えているのかわかんないよ・・でも、そうまで言うなら努力するよ」"
+    # print(execjsSign.call('e',word, gtk))
+    # print(signFunction.e(word, gtk))
+    # print(pyjsTranslated.e(word, gtk))
+    
