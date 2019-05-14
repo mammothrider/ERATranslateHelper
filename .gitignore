@@ -7,3 +7,8 @@ Application.exe
 已汉化内容.txt
 icon.ico
 icon.png
+\build
+\dist
+*.spec
+py2jstranslate.py
+test.py
