@@ -30,3 +30,4 @@ Depandencies: tkinter, configparser, js2py
 
 TODO：
 1、词典
+2、合并功能。将原始文件和无mark汉化文件整合。
