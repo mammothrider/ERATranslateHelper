@@ -9,7 +9,7 @@ class EraTranslator:
         self.placeFind = ["正门", "仓库", "大浴场"]
 
         self.translator = BaiduTranslator()
-        self.translator.startLazyTranslator()
+        #self.translator.startLazyTranslator()
 
         self.percentString = re.compile("%[^%]*%")
         self.threeFunction = re.compile("\\\@.*#.*\\\@")
