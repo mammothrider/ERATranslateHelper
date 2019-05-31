@@ -3,6 +3,7 @@ from tkinter import filedialog, messagebox
 from tkExtensions import *
 from Editor import *
 from ReplaceWindow import *
+from AutoTranslate import *
 class MainList(tk.Frame):
     def __init__(self, master=None, core=None):
         super().__init__(master)
@@ -11,6 +12,7 @@ class MainList(tk.Frame):
 
         self.editor = None
         self.replaceWindow = None
+        self.autoTranslateWindow = None
 
         self.master.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
@@ -87,8 +89,9 @@ class MainList(tk.Frame):
         editButton = tk.Button(buttonArea, text = 'Edit', height = 2, width = 10, command = self.openEditorWindow)
         editButton.pack(side = 'top', padx = 30, pady = 15)
 
-        translateButton = tk.Button(buttonArea, text = 'Translate', height = 2, width = 10, command = self.transAllText)
+        translateButton = tk.Button(buttonArea, text = 'Translate', height = 2, width = 10)
         translateButton.pack(side = 'top', padx = 30, pady = 15)
+        translateButton['command'] = self.openAutoTranslateWindow
 
         encodeButton = tk.Button(buttonArea, text = 'Encode', height = 2, width = 10, command = self.encodeFolder)
         encodeButton.pack(side = 'top', padx = 30, pady = 15)
@@ -138,19 +141,28 @@ class MainList(tk.Frame):
         else:
             self.replaceWindow.frame.deiconify()
 
+    def openAutoTranslateWindow(self):
+        if not self.autoTranslateWindow:
+            self.autoTranslateWindow = AutoTranslate(self, self.core)
+        else:
+            self.autoTranslateWindow.frame.deiconify()
+
     def editorWindowClosed(self):
         self.editor = None
 
     def replaceWindowClosed(self):
         self.replaceWindow = None
 
-    def transAllText(self):
-        for k in self.origin:
-            if self.core.getTextDictValue(k) == '':
-                def updateMethod(text, o = k):
-                    self.core.setTranslatedText(o, text)
-                    self.setTranslation(self.origin.index(o), text)
-                self.core.translate(k, updateMethod)
+    def autoTranslateWindowClosed(self):
+        self.autoTranslateWindow = None
+
+    #def transAllText(self):
+    #    for k in self.origin:
+    #        if self.core.getTextDictValue(k) == '':
+    #            def updateMethod(text, o = k):
+    #                self.core.setTranslatedText(o, text)
+    #                self.setTranslation(self.origin.index(o), text)
+    #            self.core.translate(k, updateMethod)
 
     #due to no same key in dict
     def getOriginPosition(self, ori):
