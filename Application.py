@@ -32,7 +32,9 @@ class Application:
         #define function
         self.translate = self.eraTranslator.translate
         self.encodeFolder = self.erbFileManager.encodeFolder
-    
+        self.setTranslateParams = self.eraTranslator.setTranslateParams
+        self.stopTranslate = self.eraTranslator.stopTranslate
+
     def run(self):
         self.app.mainloop()
 

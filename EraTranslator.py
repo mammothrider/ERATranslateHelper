@@ -9,8 +9,12 @@ class EraTranslator:
         self.placeFind = ["正门", "仓库", "大浴场"]
 
         self.translator = BaiduTranslator()
-        #self.translator.startLazyTranslator()
 
+        #setting params function
+        self.setTranslateParams = self.translator.setParams
+        self.stopTranslate = self.translator.stopTranslate
+
+        #re related
         self.percentString = re.compile("%[^%]*%")
         self.threeFunction = re.compile("\\\@.*#.*\\\@")
         self.insideOutPattern = re.compile("%[^%]*\"?[^%]*\"?[^%]*%")
