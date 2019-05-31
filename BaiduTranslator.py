@@ -9,12 +9,13 @@ import re
 from pyjsTranslated import pyjsTranslated
 import os
 
-class BaiduTranslator:
-    def __init__(self):
-        self.translateThread = None
-        self.linkAddress = 'https://fanyi.baidu.com/v2transapi'
+from AbstractTranslator import *
 
-        self.translateQueue = []
+class BaiduTranslator(AbstractTranslator):
+    def __init__(self):
+        super().__init__()
+
+        self.linkAddress = 'https://fanyi.baidu.com/v2transapi'
         
         self.baidu_url = "https://www.baidu.com/"
         self.root_url = "https://fanyi.baidu.com/"
@@ -30,7 +31,7 @@ class BaiduTranslator:
             'token': None,# 常量
         }
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36',
         }
 
         self.session = requests.session()
@@ -64,61 +65,41 @@ class BaiduTranslator:
         return sign
 
     #https://zhuanlan.zhihu.com/p/46111212
-    def translate(self, word, data):
-        data['query'] = word
-        data['sign'] = self.generate_sign(word)
+    def translate(self, word):
+        self.data['query'] = word
+        self.data['sign'] = self.generate_sign(word)
         try:
-            r = self.session.post(self.linkAddress, data=data, headers=self.headers).text
+            r = self.session.post(self.linkAddress, data=self.data, headers=self.headers).text
         except:
             print("Connection Error. Wait 5 seconds.")
             time.sleep(5)
-            return ''
+            return 'error'
 
         try:
             r = json.loads(r)
         except:
             print("Json Load Error.")
             print("Content: ", r)
-            return ''
+            return 'error'
         
         try:
             return r["trans_result"]["data"][0]['dst']
         except:
             print("Sign Error: ", r)
-            print('sign', data['sign'])
-            return ''
+            print('sign', self.data['sign'])
+            return 'error'
         
-    def checkAndTranslate(self):
-        while True:
-            if len(self.translateQueue) > 0:
-                next = self.translateQueue.pop()
-                next[1](self.translate(next[0], self.data))
-                time.sleep(0.2)
-            else:
-                break;
-        
-    def startLazyTranslator(self):
-        self.translateThread = threading.Thread(target = self.checkAndTranslate)
-        self.translateThread.setDaemon(True)
-        self.translateThread.start()
 
-    def addTranslate(self, text, updateMethod):
-        #print('called')
-        self.translateQueue.append((text, updateMethod))
-
-        if not self.translateThread or not self.translateThread.is_alive():
-            self.startLazyTranslator()
-
-os.environ["EXECJS_RUNTIME"] = "Node"
+# os.environ["EXECJS_RUNTIME"] = "Node"
 
 if __name__ == '__main__':
     baidu = BaiduTranslator()
     token, gtk = baidu.get_token_gtk()
     print(gtk)
-    # baidu.startLazyTranslator()
-    # a = "わ、私のことが嫌いになったの"
-    # baidu.addTranslate(a, print)
-    # input()
+    baidu.startTranslator()
+    a = "わ、私のことが嫌いになったの"
+    baidu.addTranslate(a, print)
+    input()
 
     #sign test
     # print(execjs.get().name)
