@@ -25,7 +25,13 @@
     <Content Include="templates\upload.html" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractTranslator.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Application.py" />
+    <Compile Include="AutoTranslate.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="BaiduTranslator.py" />
     <Compile Include="MainList.py">
       <SubType>Code</SubType>

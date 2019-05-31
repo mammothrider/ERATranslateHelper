@@ -12,3 +12,5 @@ icon.png
 *.spec
 py2jstranslate.py
 test.py
+test.build
+test.dist
