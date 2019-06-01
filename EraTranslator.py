@@ -19,6 +19,8 @@ class EraTranslator:
         self.threeFunction = re.compile("\\\@.*#.*\\\@")
         self.insideOutPattern = re.compile("%[^%]*\"?[^%]*\"?[^%]*%")
         self.threeStart = re.compile("(\\\@).*\?")
+
+        self.bracketsPattern = re.compile("{[^{^}]*}")
     
     def insideOut(self, text):
         text = text.replace('%"', '')
@@ -55,10 +57,21 @@ class EraTranslator:
             return self.threeFunctionHandle(text)
             
         mapping = {}
-        result = self.percentString.findall(text)
-        
+
+        #replace {} pattern
+        result = self.bracketsPattern.findall(text)
+        replaceNumber = 10
+        for number in result:
+            replaceStr = str(replaceNumber)
+            replaceNumber += 1
+
+            text = text.replace(number, replaceStr)
+            mapping[replaceStr] = number
+
+        #replace %% pattern
         nameKey = 0
         placeKey = 0
+        result = self.percentString.findall(text)
         for name in result:
             if name.find("PLACE") != -1:
                 text = text.replace(name, self.place[placeKey])
