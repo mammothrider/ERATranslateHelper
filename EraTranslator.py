@@ -1,4 +1,6 @@
 from BaiduTranslator import *
+from BaiduAPITranslator import *
+import Config
 import re
 
 #main program
@@ -8,13 +10,18 @@ class EraTranslator:
         self.place = ["正門", "納屋", "大浴場"]
         self.placeFind = ["正门", "仓库", "大浴场"]
 
-        self.translator = BaiduTranslator()
+        translator = Config.get("Translator", "value")
+        if translator == "BaiduAPI":
+            self.translator = BaiduAPITranslator()
+        else:
+            self.translator = BaiduTranslator()
 
         #setting params function
         self.setTranslateParams = self.translator.setParams
         self.stopTranslate = self.translator.stopTranslate
 
         #re related
+        self.allEnglish = re.compile("^[\w:%\s]+$")
         self.percentString = re.compile("%[^%]*%")
         self.threeFunction = re.compile("\\\@.*#.*\\\@")
         self.insideOutPattern = re.compile("%[^%]*\"?[^%]*\"?[^%]*%")
@@ -38,9 +45,9 @@ class EraTranslator:
             return text, p
 
         header = self.threeStart.match(three)[0]
-        p["xx"] =  header
+        p["--mark1--"] =  header
         #p["**"] = '#'
-        p["yy"] = r"\@"
+        p["--mark2--"] = r"\@"
 
         for k in p:
             text = text.replace(p[k], k)
@@ -50,13 +57,17 @@ class EraTranslator:
     def removeFormatName(self, text):
         #if text.startswith('%') and text.endswith('%'):
         #if text.startswith('%"'):
+        if self.allEnglish.search(text) != None:
+            print("No Japanese found")
+            return None, {}
+        
         if self.insideOutPattern.search(text) != None:
             text = self.insideOut(text)
 
-        if self.threeFunction.search(text) != None:
-            return self.threeFunctionHandle(text)
-            
         mapping = {}
+
+        if self.threeFunction.search(text) != None:
+            text, mapping = self.threeFunctionHandle(text)
 
         #replace {} pattern
         result = self.bracketsPattern.findall(text)
@@ -101,11 +112,12 @@ class EraTranslator:
 
     def translate(self, text, updateMethod):
         text, tmpMap = self.removeFormatName(text)
-        self.translator.addTranslate(text, lambda x: updateMethod(self.recoverFormatName(x, tmpMap)))
+        if text:
+            self.translator.addTranslate(text, lambda x: updateMethod(self.recoverFormatName(x, tmpMap)))
     
 if __name__ == '__main__':
     a = EraTranslator()
-    text = "「私が、きっとなんとかするわ。……当然でしょう？　%CALLNAME:MASTER%は、%CALLNAME:奴隶%のものなんだから」"
+    text = "%CALLNAME:MASTER%は\@ TALENT:MASTER:男 ? 屈服の呻きが漏れるのを噛み殺しながら # 飲み込み切れない甘く上擦った声を漏らしながら \@絶頂した"
     text, mapping = a.removeFormatName(text)
     print(text, mapping)
     text = a.recoverFormatName(text, mapping)
