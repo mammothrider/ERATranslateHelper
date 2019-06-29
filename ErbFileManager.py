@@ -4,7 +4,7 @@ import os
 class ErbFileManager:
     def __init__(self):
         self.mark = Config.get('mark', 'value')
-        self.coding = 'UTF-8'
+        #self.coding = 'UTF-8'
 
     def setAddress(self, address):
         self.address = address
@@ -36,12 +36,11 @@ class ErbFileManager:
             raise ValueError("No Address!")
         
         try:
-            file = open(address, "r", encoding='UTF-8')
+            file = open(address, "r", encoding='utf_8_sig')
             self.content = file.readlines()
         except:
             file.close()
             file = open(address, "r", encoding='Shift-JIS')
-            self.coding = 'Shift-JIS'
             self.content = file.readlines()
         
         #self.getSentence(self.content)

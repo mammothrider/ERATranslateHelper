@@ -224,7 +224,7 @@ class MainList(tk.Frame):
         self.translateList.delete(position + 1)
 
     def moveToItem(self, index):
-        if index and index > -1 and index < self.originList.size():
+        if index != None and index > -1 and index < self.originList.size():
             #clear selection
             self.originList.selection_clear(0, 'end')
             self.translateList.selection_clear(0, 'end')
@@ -238,14 +238,14 @@ class MainList(tk.Frame):
             return
 
     def movePreviousItem(self, index = None):
-        if not index:
+        if index == None:
             index = self.getCurrentSelection()
-            
+        
         self.moveToItem(index - 1)
         self.openEditorWindow()
 
     def moveNextItem(self, index = None):
-        if not index:
+        if index == None:
             index = self.getCurrentSelection()
 
         self.moveToItem(index + 1)
