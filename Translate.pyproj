@@ -32,6 +32,9 @@
     <Compile Include="AutoTranslate.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="BaiduAPITranslator.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="BaiduTranslator.py" />
     <Compile Include="MainList.py">
       <SubType>Code</SubType>
