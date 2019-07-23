@@ -114,6 +114,15 @@ class MainList(tk.Frame):
             
             self.core.openFile(file)
             self.refreshList()
+            
+            #close window
+            if self.editor:
+                self.editor.closeWindow()
+            if self.replaceWindow:
+                self.replaceWindow.closeWindow()
+            if self.autoTranslateWindow:
+                self.autoTranslateWindow.closeWindow()
+            self.core.stopTranslate()
 
     def encodeFolder(self):
         folder = filedialog.askdirectory()
