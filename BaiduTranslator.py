@@ -25,13 +25,13 @@ class BaiduTranslator(AbstractTranslator):
             'from': 'jp',# 输入的语言
             'to': 'zh', # 需要输出的语言
             'query': None, # 需要翻译的词或句子
-            'transtype': 'realtime', # 常量
+            'transtype': 'translang', # 常量
             'simple_means_flag': '3',# 常量
             'sign': None, # 由query生成的一个数字
             'token': None,# 常量
         }
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36',
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
         }
 
         self.session = requests.session()
@@ -54,7 +54,6 @@ class BaiduTranslator(AbstractTranslator):
         html_str = resp.content.decode()
         token = re.findall(r"token: '(.*?)'", html_str)[0]
         gtk = re.findall(r"window.gtk = '(.*?)'", html_str)[0]
-        #print('gtk: ', gtk)
         return token,gtk
         
     def generate_sign(self, text):
@@ -74,6 +73,8 @@ class BaiduTranslator(AbstractTranslator):
             print("Connection Error. Wait 5 seconds.")
             time.sleep(5)
             return 'error'
+            
+        # print(r.encode('utf-8').decode('unicode_escape'))
 
         try:
             r = json.loads(r)
@@ -82,20 +83,29 @@ class BaiduTranslator(AbstractTranslator):
             print("Content: ", r)
             return 'error'
         
-        try:
-            return r["trans_result"]["data"][0]['dst']
-        except:
-            print("Sign Error: ", r)
+        # try:
+            # return r["trans_result"]["data"][0]['dst']
+        # except:
+            # print("Sign Error: ", r)
+            # print('sign', self.data['sign'])
+            # return 'error'
+        
+        if "trans_result" not in r:
+            print("key error: ", r)
             print('sign', self.data['sign'])
             return 'error'
+        
+        trans_result = r["trans_result"]["data"]
+        res = []
+        for i in range(len(trans_result)):
+            res.append(trans_result[i]["dst"])
+        return '\n'.join(res)
         
 
 # os.environ["EXECJS_RUNTIME"] = "Node"
 
 if __name__ == '__main__':
     baidu = BaiduTranslator()
-    token, gtk = baidu.get_token_gtk()
-    print(gtk)
     baidu.startTranslator()
     a = "わ、私のことが嫌いになったの"
     baidu.addTranslate(a, print)

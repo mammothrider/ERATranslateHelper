@@ -56,12 +56,16 @@ class BaiduAPITranslator(AbstractTranslator):
             print("Content: ", r)
             return 'error'
         
-        try:
-            return r["trans_result"][0]['dst']
-        except:
+        if "trans_result" not in r:
             print("Key Error: ", r)
             print('sign', self.data['sign'])
             return 'error'
+        
+        trans_result = r["trans_result"]
+        res = []
+        for i in range(len(trans_result)):
+            res.append(trans_result[i]["dst"])
+        return '\n'.join(res)
     
 
 if __name__ == '__main__':

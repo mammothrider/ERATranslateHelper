@@ -21,7 +21,8 @@ class EraTranslator:
         self.stopTranslate = self.translator.stopTranslate
 
         #re related
-        self.allEnglish = re.compile("^[\w:%\s]+$")
+        #0020-007f english and punctuation, 3000-303f japanese punc, ff00-ff0f full size punc
+        self.noJapanese = re.compile("^[\s\u0020-\u007f\u3000-\u303f\uff00-\uff0f]+$", re.U)
         self.percentString = re.compile("%[^%]*%")
         self.threeFunction = re.compile("\\\@.*#.*\\\@")
         self.insideOutPattern = re.compile("%[^%]*\"?[^%]*\"?[^%]*%")
@@ -45,20 +46,20 @@ class EraTranslator:
             return text, p
 
         header = self.threeStart.match(three)[0]
-        p["--mark1--"] =  header
-        #p["**"] = '#'
-        p["--mark2--"] = r"\@"
+        p["mark1"] =  header
+        p["mark2"] = '#'
+        p["mark3"] = "\\@"
 
         for k in p:
-            text = text.replace(p[k], k)
+            text = text.replace(p[k], "\n{}\n".format(k))
+            # text = text.replace(p[k], k)
         
         return text, p
     
     def removeFormatName(self, text):
         #if text.startswith('%') and text.endswith('%'):
         #if text.startswith('%"'):
-        if self.allEnglish.search(text) != None:
-            print("No Japanese found")
+        if self.noJapanese.search(text) != None:
             return None, {}
         
         if self.insideOutPattern.search(text) != None:
@@ -71,7 +72,7 @@ class EraTranslator:
 
         #replace {} pattern
         result = self.bracketsPattern.findall(text)
-        replaceNumber = 10
+        replaceNumber = 723
         for number in result:
             replaceStr = str(replaceNumber)
             replaceNumber += 1
@@ -99,6 +100,7 @@ class EraTranslator:
         return text, mapping
 
     def recoverFormatName(self, text, mapping):
+        print(text)
         #real percentage mark
         if '%' in text:
             text = text.replace('%', '\%')
@@ -108,17 +110,24 @@ class EraTranslator:
                 text = text.replace(self.placeFind[self.place.index(k)], mapping[k])
             else:
                 text = text.replace(k, mapping[k])
+        text = text.replace('\n', '') + '\n'
+        print(text)
         return text
 
     def translate(self, text, updateMethod):
         text, tmpMap = self.removeFormatName(text)
+        print(text)
+        print(tmpMap)
         if text:
             self.translator.addTranslate(text, lambda x: updateMethod(self.recoverFormatName(x, tmpMap)))
     
 if __name__ == '__main__':
     a = EraTranslator()
-    text = "%CALLNAME:MASTER%は\@ TALENT:MASTER:男 ? 屈服の呻きが漏れるのを噛み殺しながら # 飲み込み切れない甘く上擦った声を漏らしながら \@絶頂した"
-    text, mapping = a.removeFormatName(text)
-    print(text, mapping)
-    text = a.recoverFormatName(text, mapping)
-    print(text)
+    # text = "それは彼女が心の奥底でそれを望んでいたわけではない\@ABL:触手中毒 >= 3 ? …こともないが…何はともあれそうではない # …\@ことなのだ。"
+    text = "「ほんと、やらしいんだから……\@ COND('発情期') && BASE:欲求不満 >= 50 ? ♪ # \@」"
+    # text, mapping = a.removeFormatName(text)
+    # print(text, mapping)
+    # text = a.recoverFormatName(text, mapping)
+    # print(text)
+    a.translate(text, print)
+    time.sleep(10)
