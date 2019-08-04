@@ -1,9 +1,9 @@
-import Config
+from Config import config
 import os
 #file manager
 class ErbFileManager:
     def __init__(self):
-        self.mark = Config.get('mark', 'value')
+        self.mark = config.get('mark', 'value')
         #self.coding = 'UTF-8'
 
     def setAddress(self, address):

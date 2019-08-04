@@ -1,6 +1,6 @@
 import requests
 import json
-import Config
+from Config import config
 import time
 import hashlib
 from AbstractTranslator import *
@@ -11,8 +11,8 @@ class BaiduAPITranslator(AbstractTranslator):
     
         self.translate_url = "https://fanyi-api.baidu.com/api/trans/vip/translate"
         
-        self.appid = Config.get("BaiduAPI", "appid")
-        self.password = Config.get("BaiduAPI", "password")
+        self.appid = config.get("BaiduAPI", "appid")
+        self.password = config.get("BaiduAPI", "password")
         
         self.data = {
             'from': 'jp',# 输入的语言

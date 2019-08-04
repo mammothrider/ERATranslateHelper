@@ -1,6 +1,5 @@
 import requests
 import json
-import Config
 import time
 import threading
 import re

@@ -2,7 +2,7 @@ import tkinter as tk
 from ErbFileManager import *
 from EraTranslator import *
 from MainList import *
-import Config
+from Config import config
 
 #import pysnooper
 
@@ -20,11 +20,17 @@ class Application:
         #contains origin and translated sentence
         self.textDict = {}
 
+        #re get pattern
+        translatePattern = config.getPattern("TranslatePattern")
+        ignorePattern = config.getPattern("IgnorePattern")
+        self.obtain = re.compile(translatePattern)
+        self.ignore = re.compile(ignorePattern, re.U)
+
         #saved mark
         self.saved = True
 
         #translated mark
-        self.mark = Config.get('mark', 'value')
+        self.mark = config.get('mark', 'value')
 
         self.eraTranslator = EraTranslator()
         self.erbFileManager = ErbFileManager()
@@ -52,36 +58,30 @@ class Application:
         #printList = [ "PRINTFORMW", "PRINTFORML", "PRINTFORM", "PRINTL", "PRINTW", "PRINT", "DATAFORM"]
 
         for i in range(len(content)):
-            text = content[i].strip()
-            if text.startswith("PRINT") or text.startswith("DATA"):
-                #remove print command
-                tmpList = text.split(' ')
-                #check first word
-                #if tmpList[0] not in printList:
-                #    continue
+            text = self.obtain.search(content[i])
+            if not text:
+                continue
 
-                #not empty line
-                if len(tmpList) > 1:
-                    #find marker
-                    translated = ''
-                    origin = ''
-                    #check translated info
-                    if i < len(content) - 1:
-                        nextList = content[i + 1].strip().split(' ')
-                    
-                    if self.mark in nextList:
-                        translated = ' '.join(tmpList[1:])
-                        origin = ' '.join(nextList[1:]).strip()
-                    else:
-                        origin = ' '.join(tmpList[1:]).strip()
+            text = list(filter(None, text.groups()))[0]
+            if self.ignore.search(content[i]) == None:
+                #check translated info
+                if i < len(content) - 1:
+                    nextList = content[i + 1].strip().split(' ')
 
-                    #check dict existance
-                    if origin not in self.originLineNumber:
-                       self.originLineNumber[origin] = []
-                    self.originLineNumber[origin] += [i]
+                translated = None
+                if self.mark in nextList:
+                    translated = text
+                    origin = ' '.join(nextList[1:]).strip()
+                else:
+                    origin = text
 
-                    #add to translate list
-                    self.textDict[origin] = translated
+                #check dict existance
+                if origin not in self.originLineNumber:
+                    self.originLineNumber[origin] = []
+                self.originLineNumber[origin] += [i]
+
+                #add to translate list
+                self.textDict[origin] = translated
         print("Total: ", len(self.textDict))
     
     def saveFile(self):

@@ -1,16 +1,19 @@
 from BaiduTranslator import *
 from BaiduAPITranslator import *
-import Config
+from Config import config
 import re
 
 #main program
 class EraTranslator:
     def __init__(self):
+        self.waitingQueue = {}
+        self.markQueue = {}
+
         self.name = ["灵梦", "魔理沙", "八云紫", "红美玲", "AA", "BB", "CC"]
         self.place = ["正門", "納屋", "大浴場"]
         self.placeFind = ["正门", "仓库", "大浴场"]
 
-        translator = Config.get("Translator", "value")
+        translator = config.get("Translator", "value")
         if translator == "BaiduAPI":
             self.translator = BaiduAPITranslator()
         else:

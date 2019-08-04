@@ -38,7 +38,7 @@ class AutoTranslate():
         cooldownLable.grid(row = 0, column = 0, sticky=tk.E)
 
         self.cooldownTimeText = tk.Entry (settingFrame, **entrySetting)
-        self.cooldownTimeText.insert(tk.END, '1')
+        self.cooldownTimeText.insert(tk.END, '2')
         self.cooldownTimeText.grid(row = 0, column = 1)
         
         retryTimeLable = tk.Label(settingFrame, text = '重试时间:', **labelSetting)
