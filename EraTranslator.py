@@ -7,11 +7,26 @@ import re
 class EraTranslator:
     def __init__(self):
         self.waitingQueue = {}
-        self.markQueue = {}
+        self.matchingQueue = {}
+    
+        splitPattern = config.getPattern("SplitPattern")
+        namePattern = config.getPattern("NamePattern")
+        placePattern = config.getPattern("PlacePattern")
+        numberPattern = config.getPattern("NumberPattern")
+        self.splitFormat = re.compile(splitPattern)
+        self.nameFormat = re.compile(namePattern)
+        self.placeFormat = re.compile(placePattern)
+        self.numberFormat = re.compile(numberPattern)
+        
+        finalReplacePattern = config.items("ReplacePunctuation")
+        self.finalReplacement = {}
+        for item in finalReplacePattern:
+            self.finalReplacement[item[0]] = re.compile(item[1])
 
         self.name = ["灵梦", "魔理沙", "八云紫", "红美玲", "AA", "BB", "CC"]
         self.place = ["正門", "納屋", "大浴場"]
         self.placeFind = ["正门", "仓库", "大浴场"]
+        self.itemReplace = ["AA", "BB", "CC", "DD", "EE"]
 
         translator = config.get("Translator", "value")
         if translator == "BaiduAPI":
@@ -22,16 +37,11 @@ class EraTranslator:
         #setting params function
         self.setTranslateParams = self.translator.setParams
         self.stopTranslate = self.translator.stopTranslate
-
+        
         #re related
-        #0020-007f english and punctuation, 3000-303f japanese punc, ff00-ff0f full size punc
-        self.noJapanese = re.compile("^[\s\u0020-\u007f\u3000-\u303f\uff00-\uff0f]+$", re.U)
         self.percentString = re.compile("%[^%]*%")
-        self.threeFunction = re.compile("\\\@.*#.*\\\@")
         self.insideOutPattern = re.compile("%[^%]*\"?[^%]*\"?[^%]*%")
-        self.threeStart = re.compile("(\\\@).*\?")
 
-        self.bracketsPattern = re.compile("{[^{^}]*}")
     
     def insideOut(self, text):
         text = text.replace('%"', '')
@@ -39,42 +49,28 @@ class EraTranslator:
         text = text.replace('+"', '%')
         text = text.replace('"+', '%')
         return text
-
-    def threeFunctionHandle(self, text):
-        p = {}
-        three = self.threeFunction.search(text)
-        if three:
-            three = three[0]
-        else:
-            return text, p
-
-        header = self.threeStart.match(three)[0]
-        p["mark1"] =  header
-        p["mark2"] = '#'
-        p["mark3"] = "\\@"
-
-        for k in p:
-            text = text.replace(p[k], "\n{}\n".format(k))
-            # text = text.replace(p[k], k)
         
-        return text, p
-    
-    def removeFormatName(self, text):
-        #if text.startswith('%') and text.endswith('%'):
-        #if text.startswith('%"'):
-        if self.noJapanese.search(text) != None:
-            return None, {}
-        
-        if self.insideOutPattern.search(text) != None:
-            text = self.insideOut(text)
+    def getMarker(self):
+        self.markCounter += 1
+        if self.markCounter > 1000000000:
+            self.markCounter = 0
+        return self.markCounter
 
+    def splitSentence(self, text):
+        result = self.splitPattern.search(text)
+        
+        #nothing match
+        if not result:
+            return [text]
+            
+        res = [i for i in result.group(*range(1, self.splitPattern.groups)) if i]
+        return res
+
+    def removeFormatName(self, text)
         mapping = {}
 
-        if self.threeFunction.search(text) != None:
-            text, mapping = self.threeFunctionHandle(text)
-
         #replace {} pattern
-        result = self.bracketsPattern.findall(text)
+        result = self.numberFormat.findall(text)
         replaceNumber = 723
         for number in result:
             replaceStr = str(replaceNumber)
@@ -83,46 +79,90 @@ class EraTranslator:
             text = text.replace(number, replaceStr)
             mapping[replaceStr] = number
 
+        #replace name
+        count = 0
+        result = self.nameFormat.findall(text)
+        for name in result:
+            text = text.replace(name, self.name[count])
+            mapping[self.name[count]] = name
+            
+            count = (count + 1) % len(self.name)
+            
+        #replace place
+        count = 0
+        result = self.placeFormat.findall(text)
+        for place in result:
+            text = text.replace(place, self.place[count])
+            mapping[self.place[count]] = place
+            
+            count = (count + 1) % len(self.place)
+
         #replace %% pattern
         nameKey = 0
-        placeKey = 0
         result = self.percentString.findall(text)
         for name in result:
-            if name.find("PLACE") != -1:
-                text = text.replace(name, self.place[placeKey])
-                mapping[self.place[placeKey]] = name
-                
-                placeKey = (placeKey + 1) % len(self.place)
-            else:
-                text = text.replace(name, self.name[nameKey])
-                mapping[self.name[nameKey]] = name
-                
-                nameKey = (nameKey + 1) % len(self.name)
+            text = text.replace(name, self.itemReplace[nameKey])
+            mapping[self.itemReplace[nameKey]] = name
+            
+            nameKey = (nameKey + 1) % len(self.itemReplace)
 
         text = text.strip()
         return text, mapping
 
-    def recoverFormatName(self, text, mapping):
-        print(text)
+    def recoverFormatName(self, translated, substring, origin):
         #real percentage mark
-        if '%' in text:
-            text = text.replace('%', '\%')
+        if '%' in translated:
+            translated = translated.replace('%', '\%')
 
+        mapping = self.waitingQueue[origin]["mapping"].pop(substring)
         for k in mapping:
             if k in self.place:
-                text = text.replace(self.placeFind[self.place.index(k)], mapping[k])
+                translated = translated.replace(self.placeFind[self.place.index(k)], mapping[k])
             else:
-                text = text.replace(k, mapping[k])
-        text = text.replace('\n', '') + '\n'
-        print(text)
-        return text
+                translated = translated.replace(k, mapping[k])
+
+        self.waitingQueue[origin]["result"][substring] = translated
+        
+        #mapping is none, means all is recovered
+        mapping = self.waitingQueue[origin]["result"]
+        translated = origin
+        for k in mapping:
+            translated = translated.replace(k, mapping[k])
+            
+        for key in self.finalReplacement:
+            result = self.finalReplacement[key].sub(key, translated)
+            
+        self.waitingQueue[origin]["recall"](translated)
+        
 
     def translate(self, text, updateMethod):
-        text, tmpMap = self.removeFormatName(text)
-        print(text)
-        print(tmpMap)
-        if text:
-            self.translator.addTranslate(text, lambda x: updateMethod(self.recoverFormatName(x, tmpMap)))
+        if not text:
+            return
+            
+        if self.insideOutPattern.search(text) != None:
+            text = self.insideOut(text)
+        origin = text
+        
+        #origin: {result:{sub:result}, mapping:{sub:map}, recall:}
+        self.waitingQueue[origin] = {}
+        self.waitingQueue[origin]["result"] = {}
+        self.waitingQueue[origin]["mapping"] = {}
+        self.waitingQueue[origin]["recall"] = updateMethod
+        
+        group = self.splitSentence(text)
+        waitingList = []
+        for sub in group:
+            wait, mapping = self.removeFormatName(sub)
+            if not wait:
+                continue
+                
+            self.waitingQueue[origin]["mapping"][sub] = mapping
+            waitingList.append((wait, sub))
+            
+        #start after all finished
+        for item in waitingList:
+            self.translator.addTranslate(item[0], lambda x: self.recoverFormatName(x, item[1], origin))
+            
     
 if __name__ == '__main__':
     a = EraTranslator()

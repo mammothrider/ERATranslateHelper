@@ -49,6 +49,7 @@ if __name__ == '__main__':
     # a = "DATAFORM ……　どうしますか？"
     # test(section, a)
 
-    section = "IgnorePattern"
-    a = "%\" \" * 18%"
-    test(section, a)
+    section = "ReplacePunctuation"
+    print(config.items(section))
+    # a = "%\" \" * 18%"
+    # test(section, a)
