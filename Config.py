@@ -49,7 +49,8 @@ if __name__ == '__main__':
     # a = "DATAFORM ……　どうしますか？"
     # test(section, a)
 
-    section = "ReplacePunctuation"
-    print(config.items(section))
-    # a = "%\" \" * 18%"
-    # test(section, a)
+    section = "NamePattern"
+    # print(config.items(section))
+    # a = "「ほんと、やらしいんだから……\@ COND('発情期') && BASE:欲求不満 >= 50 ? ♪ # \@ことも」"
+    a = "%CALLNAME:ARG%は%NAME(0)%に膝枕をしている。"
+    test(section, a)

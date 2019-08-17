@@ -5,7 +5,7 @@ class AbstractTranslator:
     def __init__(self):
         self.translateThread = None
         self.translateQueue = []
-        self.sleepTime = 0.5
+        self.sleepTime = 2
         self.retryDelayTime = 5 #retry every 5 second
         self.retryTimes = 5 #retry 5 times
 
@@ -13,7 +13,7 @@ class AbstractTranslator:
 
     def translate(self, word): pass
         
-    def setParams(self, sleepTime = 0.5, retryDelayTime = 5, retryTimes = 5):
+    def setParams(self, sleepTime = 2, retryDelayTime = 5, retryTimes = 5):
         self.sleepTime = sleepTime
         self.retryDelayTime = retryDelayTime
         self.retryTimes = retryTimes

@@ -43,6 +43,7 @@ class BaiduAPITranslator(AbstractTranslator):
         self.data['q'] = word
         self.data['sign'] = self.generate_sign(word)
         try:
+            # print("POST", word)
             r = self.session.post(self.translate_url, data=self.data).text
         except:
             print("Connection Error. Wait 5 seconds.")
