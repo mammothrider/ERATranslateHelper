@@ -111,7 +111,7 @@ class AutoTranslate():
         self.core.setTranslateParams(sleepTime = sleep, retryDelayTime = delay, retryTimes = time)
             
         for k in targetList[fromLine:toLine]:
-            if self.core.getTextDictValue(k) == '':
+            if not self.core.getTextDictValue(k):
                 def updateMethod(text, o = k):
                     self.core.setTranslatedText(o, text)
                     self.master.setTranslation(targetList.index(o), text)

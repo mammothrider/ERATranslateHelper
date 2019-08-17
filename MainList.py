@@ -80,27 +80,36 @@ class MainList(tk.Frame):
         self.numberList.bind("<MouseWheel>", OnMouseWheel)
 
         #button
-        openButton = tk.Button(buttonArea, text = 'Open File', height = 2, width = 10, command = self.openButton)
+        openButton = tk.Button(buttonArea, text = '打开文件', height = 2, width = 10, command = self.openButton)
         openButton.pack(side = 'top', padx = 30, pady = 15)
         
-        saveButton = tk.Button(buttonArea, text = 'Save File', height = 2, width = 10, command = self.saveButton)
+        saveButton = tk.Button(buttonArea, text = '保存文件', height = 2, width = 10, command = self.saveButton)
         saveButton.pack(side = 'top', padx = 30, pady = 15)
-        
-        editButton = tk.Button(buttonArea, text = 'Edit', height = 2, width = 10, command = self.openEditorWindow)
+
+        openDictButton = tk.Button(buttonArea, text = '读取字典', height = 2, width = 10, command = self.openDictionary)
+        openDictButton.pack(side = 'top', padx = 30, pady = 15)
+
+        saveDictButton = tk.Button(buttonArea, text = '保存字典', height = 2, width = 10, command = self.core.saveDictionary)
+        saveDictButton.pack(side = 'top', padx = 30, pady = 15)
+
+        editButton = tk.Button(buttonArea, text = '文本编辑', height = 2, width = 10, command = self.openEditorWindow)
         editButton.pack(side = 'top', padx = 30, pady = 15)
 
-        translateButton = tk.Button(buttonArea, text = 'Translate', height = 2, width = 10)
+        translateButton = tk.Button(buttonArea, text = '批量翻译', height = 2, width = 10)
         translateButton.pack(side = 'top', padx = 30, pady = 15)
         translateButton['command'] = self.openAutoTranslateWindow
 
-        encodeButton = tk.Button(buttonArea, text = 'Encode', height = 2, width = 10, command = self.encodeFolder)
+        encodeButton = tk.Button(buttonArea, text = '转换编码', height = 2, width = 10, command = self.encodeFolder)
         encodeButton.pack(side = 'top', padx = 30, pady = 15)
 
         #list bind
         self.originList.bind('<Double-Button-1>', self.openEditorWindow)
         self.translateList.bind('<Double-Button-1>', self.openEditorWindow)
 
-        replaceButton = tk.Button(buttonArea, text = 'Replace', height = 2, width = 10, command = self.openReplaceWindow)
+        replaceButton = tk.Button(buttonArea, text = '查找替换', height = 2, width = 10, command = self.openReplaceWindow)
+        replaceButton.pack(side = 'top', padx = 30, pady = 15)
+
+        replaceButton = tk.Button(buttonArea, text = '全部删除', height = 2, width = 10, command = self.clearAllTranslated)
         replaceButton.pack(side = 'top', padx = 30, pady = 15)
 
     def openButton(self):
@@ -123,6 +132,15 @@ class MainList(tk.Frame):
             if self.autoTranslateWindow:
                 self.autoTranslateWindow.closeWindow()
             self.core.stopTranslate()
+
+    def openDictionary(self):
+        allowType = [('TXT', '*.txt')]
+        dlg = filedialog.Open(self, filetypes = allowType)
+        file = dlg.show()
+        if file != '' and self.core:
+            #clear all
+            self.core.loadFromDictionary(file)
+            self.refreshList()
 
     def encodeFolder(self):
         folder = filedialog.askdirectory()
@@ -156,6 +174,10 @@ class MainList(tk.Frame):
         else:
             self.autoTranslateWindow.frame.deiconify()
 
+    def clearAllTranslated(self):
+        self.core.clearAllTranslated()
+        self.refreshList()
+
     def editorWindowClosed(self):
         self.editor = None
 
@@ -164,14 +186,6 @@ class MainList(tk.Frame):
 
     def autoTranslateWindowClosed(self):
         self.autoTranslateWindow = None
-
-    #def transAllText(self):
-    #    for k in self.origin:
-    #        if self.core.getTextDictValue(k) == '':
-    #            def updateMethod(text, o = k):
-    #                self.core.setTranslatedText(o, text)
-    #                self.setTranslation(self.origin.index(o), text)
-    #            self.core.translate(k, updateMethod)
 
     #due to no same key in dict
     def getOriginPosition(self, ori):

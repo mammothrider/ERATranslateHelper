@@ -43,7 +43,8 @@ class EraTranslator:
         
         #re related
         self.percentString = re.compile("%[^%]*%")
-        self.insideOutPattern = re.compile("%[^%]*\"?[^%]*\"?[^%]*%")
+        #have target text between %%
+        self.insideOutPattern = re.compile("%[^%]*\"[^%]*\"[^%^\*]*%")
 
     
     def insideOut(self, text):
@@ -148,10 +149,11 @@ class EraTranslator:
         for key in self.finalReplacement:
             result = self.finalReplacement[key].sub(key, translated)
             
-        print(translated, self.waitingQueue[origin]["recall"])
-        self.waitingQueue[origin]["recall"](translated)
+        if not self.waitingQueue[origin]["mapping"]:
+        # print(translated, self.waitingQueue[origin]["recall"])
+            self.waitingQueue[origin]["recall"](translated)
         
-
+    
     def translate(self, text, updateMethod):
         if not text:
             return
@@ -159,6 +161,7 @@ class EraTranslator:
         if self.insideOutPattern.search(text) != None:
             text = self.insideOut(text)
         origin = text
+        # print("origin", origin)
         
         #origin: {result:{sub:result}, mapping:{sub:map}, recall:}
         self.waitingQueue[origin] = {}
@@ -187,9 +190,11 @@ class EraTranslator:
     
 if __name__ == '__main__':
     a = EraTranslator()
-    # text = "それは彼女が心の奥底でそれを望んでいたわけではない\@ABL:触手中毒 >= 3 ? …こともないが…何はともあれそうではない # …\@ことなのだ。"
+    text = "それは彼女が心の奥底でそれを望んでいたわけではない\@ABL:触手中毒 >= 3 ? …こともないが…何はともあれそうではない # …\@ことなのだ。"
     # text = "「ほんと、やらしいんだから……\@ COND('発情期') && BASE:欲求不満 >= 50 ? ♪ # \@」"
-    text = "%CALLNAME:ARG%は%NAME(0)%に膝枕をしている。"
+    # text = "%CALLNAME:ARG%は%NAME(0)%に膝枕をしている。"
+    # text = "\@(L_CHARA_次 > -1) ? [1003]下一个角色# %\" \" * 16%\@"
+    # text = "%\"同行中本人からお誘いあり\"%"
     # text, mapping = a.removeFormatName(text)
     # print(text, mapping)
     # text = a.recoverFormatName(text, mapping)

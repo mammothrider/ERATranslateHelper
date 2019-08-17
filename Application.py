@@ -68,7 +68,7 @@ class Application:
                 if i < len(content) - 1:
                     nextList = content[i + 1].strip().split(' ')
 
-                translated = None
+                translated = ""
                 if self.mark in nextList:
                     translated = text
                     origin = ' '.join(nextList[1:]).strip()
@@ -124,6 +124,10 @@ class Application:
     def getTextDictValue(self, origin):
         return self.textDict[origin]
 
+    def clearAllTranslated(self):
+        for key in self.textDict:
+            self.textDict[key] = ""
+
     def isEverythingSaved(self):
         return self.saved
 
@@ -159,6 +163,17 @@ class Application:
         if text in tra:
             tra = tra.replace(text, rep)
         self.setTranslatedText(ori, tra)
+
+
+    #save dictionary
+    def saveDictionary(self):
+        self.erbFileManager.saveDictionary(self.textDict)
+
+    def loadFromDictionary(self, address):
+        dictdata = self.erbFileManager.readDictionary(address)
+        for key in self.textDict:
+            if key in dictdata:
+                self.textDict[key] = dictdata[key]
 
 
 if __name__ == '__main__':

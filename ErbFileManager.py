@@ -1,5 +1,6 @@
 from Config import config
 import os
+import re
 #file manager
 class ErbFileManager:
     def __init__(self):
@@ -59,6 +60,30 @@ class ErbFileManager:
             for line in self.content:
                 if line != "removed":
                     file.write(line)
+
+    def saveDictionary(self, translated):
+        if not self.address:
+            print("No File Selected")
+            return
+
+        addr, filename = os.path.split(self.address)
+        filename = os.path.join(addr, filename.rsplit(".")[0] + "_dict.txt")
+        with open(filename, "w", encoding='utf_8_sig') as file:
+            for key in translated:
+                if key and translated[key]:
+                    file.write("{}\t{}\n".format(key, translated[key]))
+
+    def readDictionary(self, address):
+        res = {}
+
+        with open(address, "r", encoding='utf_8_sig') as file:
+            content = file.readlines()
+            for line in content:
+                text = line.strip().split("\t")
+                if len(text) == 2:
+                    res[text[0]] = text[1]
+        print(res)
+        return res
 
     def replaceContent(self, lineNumber, origin, trans):
         def hasMark():

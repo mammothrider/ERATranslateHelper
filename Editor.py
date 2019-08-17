@@ -32,15 +32,15 @@ class Editor(tk.Frame):
         contentArea.pack(side = 'top', fill = 'both', expand = 1)
         
         #add buttons
-        prev = tk.Button(buttonArea, text = 'Prev', height = 2, width = 10)
+        prev = tk.Button(buttonArea, text = '<<', height = 2, width = 10)
         prev.pack(side = 'left', padx = 10, pady = 15, expand = 1)
         prev['command'] = self.previousItem
 
-        save = tk.Button(buttonArea, text = 'Save', height = 2, width = 10)
+        save = tk.Button(buttonArea, text = '保存', height = 2, width = 10)
         save.pack(side = 'left', padx = 10, pady = 15, expand = 1)
         save['command'] = self.saveTranslated
 
-        next = tk.Button(buttonArea, text = 'Next', height = 2, width = 10)
+        next = tk.Button(buttonArea, text = '>>', height = 2, width = 10)
         next.pack(side = 'left', padx = 10, pady = 15, expand = 1)
         next['command'] = self.nextItem
 
@@ -66,10 +66,10 @@ class Editor(tk.Frame):
         webFrame.rowconfigure(1, weight = 1)
         webFrame.columnconfigure(1, weight = 1)
 
-        copy = tk.Button(webFrame, text = 'AutoCopy', height = 2, width = 7, command = self.copyButton)
+        copy = tk.Button(webFrame, text = '复制原文', height = 2, width = 7, command = self.copyButton)
         copy.grid(row = 0, column = 0, ipadx = 10, padx = 10)
 
-        trans = tk.Button(webFrame, text = 'Translate', height = 2, width = 7, command = self.translateButton)
+        trans = tk.Button(webFrame, text = '翻译', height = 2, width = 7, command = self.translateButton)
         trans.grid(row = 1, column = 0, ipadx = 10, padx = 10)
         
         self.web = tk.Text(webFrame, height = 3, width = 10)
