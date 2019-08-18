@@ -55,26 +55,27 @@ class Application:
 
     #get sentence from file
     def getSentence(self, content):
-        #printList = [ "PRINTFORMW", "PRINTFORML", "PRINTFORM", "PRINTL", "PRINTW", "PRINT", "DATAFORM"]
-
         for i in range(len(content)):
             text = self.obtain.search(content[i])
             if not text:
                 continue
 
             text = list(filter(None, text.groups()))[0]
+            # print("text", text)
             if self.ignore.search(content[i]) == None:
                 #check translated info
+                nextList = []
                 if i < len(content) - 1:
                     nextList = content[i + 1].strip().split(' ')
-
+                # print("nextList", nextList)
                 translated = ""
                 if self.mark in nextList:
                     translated = text
                     origin = ' '.join(nextList[1:]).strip()
                 else:
                     origin = text
-
+                # print("origin", origin)
+                # print("translated", translated)
                 #check dict existance
                 if origin not in self.originLineNumber:
                     self.originLineNumber[origin] = []

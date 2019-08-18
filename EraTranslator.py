@@ -61,6 +61,7 @@ class EraTranslator:
         return self.markCounter
 
     def splitSentence(self, text):
+        # print("splitSentence input", [text])
         result = self.splitFormat.search(text)
         
         #nothing match
@@ -70,7 +71,7 @@ class EraTranslator:
         res = []
         for i in result.group(*range(1, self.splitFormat.groups + 1)):
             if i and self.ignoreFormat.search(i) == None:
-                tmp = i.strip("「」")
+                tmp = i.strip(" 「」")
                 res.append(tmp)
         # print("splitSentence", res)
         return res
@@ -157,6 +158,9 @@ class EraTranslator:
     def translate(self, text, updateMethod):
         if not text:
             return
+        
+        # print("input", [text])
+        text = text.strip("\n\r")
             
         if self.insideOutPattern.search(text) != None:
             text = self.insideOut(text)
@@ -169,7 +173,7 @@ class EraTranslator:
         self.waitingQueue[origin]["mapping"] = {}
         self.waitingQueue[origin]["recall"] = updateMethod
         
-        group = self.splitSentence(text)
+        group = self.splitSentence(origin.strip(" \s\n\r「」"))
         waitingList = []
         for sub in group:
             wait, mapping = self.removeFormatName(sub)
@@ -190,11 +194,13 @@ class EraTranslator:
     
 if __name__ == '__main__':
     a = EraTranslator()
-    text = "それは彼女が心の奥底でそれを望んでいたわけではない\@ABL:触手中毒 >= 3 ? …こともないが…何はともあれそうではない # …\@ことなのだ。"
+    # text = "それは彼女が心の奥底でそれを望んでいたわけではない\@ABL:触手中毒 >= 3 ? …こともないが…何はともあれそうではない # …\@ことなのだ。"
     # text = "「ほんと、やらしいんだから……\@ COND('発情期') && BASE:欲求不満 >= 50 ? ♪ # \@」"
     # text = "%CALLNAME:ARG%は%NAME(0)%に膝枕をしている。"
     # text = "\@(L_CHARA_次 > -1) ? [1003]下一个角色# %\" \" * 16%\@"
     # text = "%\"同行中本人からお誘いあり\"%"
+    # text = "「承知致しました。一緒に行きましょう。」"
+    text = "%TEXTR(\"ほんと/やらしいんだから\")%"
     # text, mapping = a.removeFormatName(text)
     # print(text, mapping)
     # text = a.recoverFormatName(text, mapping)
