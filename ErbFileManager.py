@@ -66,8 +66,16 @@ class ErbFileManager:
             print("No File Selected")
             return
 
-        addr, filename = os.path.split(self.address)
-        filename = os.path.join(addr, filename.rsplit(".")[0] + "_dict.txt")
+        filename = os.path.basename(self.address)
+        folder = self.address.split("ERB")[0] + "dict/"
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+        filename = os.path.join(folder, filename.rsplit(".")[0] + "_dict.txt")
+        print("保存字典文件：", filename)
+        # addr, filename = os.path.split(self.address)
+        if not os.path.exists('my_folder'):
+            os.makedirs('my_folder')
+        
         with open(filename, "w", encoding='utf_8_sig') as file:
             for key in translated:
                 if key and translated[key]:
