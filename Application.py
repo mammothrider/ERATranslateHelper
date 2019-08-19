@@ -13,18 +13,8 @@ class Application:
         self.core = core
         self.app = MainList(master = self.tkRoot, core = self)
 
-        #origin line number in file
-        self.originLineNumber = {}
-        self.origin = []
-
         #contains origin and translated sentence
         self.textDict = {}
-
-        #re get pattern
-        translatePattern = config.getPattern("TranslatePattern")
-        ignorePattern = config.getPattern("IgnorePattern")
-        self.obtain = re.compile(translatePattern)
-        self.ignore = re.compile(ignorePattern, re.U)
 
         #saved mark
         self.saved = True
@@ -46,66 +36,15 @@ class Application:
 
     def openFile(self, address):
         #init
-        self.originLineNumber.clear()
         self.textDict.clear()
 
         self.erbFileManager.setAddress(address)
-        content = self.erbFileManager.readFile()
-        self.getSentence(content)
-
-    #get sentence from file
-    def getSentence(self, content):
-        for i in range(len(content)):
-            text = self.obtain.search(content[i])
-            if not text:
-                continue
-
-            text = list(filter(None, text.groups()))[0]
-            # print("text", text)
-            if self.ignore.search(content[i]) == None:
-                #check translated info
-                nextList = []
-                if i < len(content) - 1:
-                    nextList = content[i + 1].strip().split(' ')
-                # print("nextList", nextList)
-                translated = ""
-                if self.mark in nextList:
-                    translated = text
-                    origin = ' '.join(nextList[1:]).strip()
-                else:
-                    origin = text
-                # print("origin", origin)
-                # print("translated", translated)
-                #check dict existance
-                if origin not in self.originLineNumber:
-                    self.originLineNumber[origin] = []
-                self.originLineNumber[origin] += [i]
-
-                #add to translate list
-                self.textDict[origin] = translated
-        print("Total: ", len(self.textDict))
+        self.erbFileManager.readFile()
+        self.textDict = self.erbFileManager.getSentence()
     
     def saveFile(self):
-        try:
-            for k in self.textDict:
-                #have content
-                if self.textDict[k] != '':
-                    #translated text + mark + origin
-                    trans = self.textDict[k]
-                    #for multiple line have same content
-                    for line in self.originLineNumber[k]:
-                        self.erbFileManager.replaceContent(line, k, trans)
-                #replace with origin text
-                else:
-                    for line in self.originLineNumber[k]:
-                        self.erbFileManager.replaceContent(line, k, k)
-            self.erbFileManager.writeFile()
-            
-            #set saved marker
-            self.saved = True
-        except:
-            print(self.textDict)
-            print(self.originLineNumber)
+        self.erbFileManager.saveFile(self.textDict)
+        self.saved = True
 
     #set translate text dict
     def setTranslatedText(self, o, t):

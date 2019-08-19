@@ -5,7 +5,13 @@ import re
 class ErbFileManager:
     def __init__(self):
         self.mark = config.get('mark', 'value')
-        #self.coding = 'UTF-8'
+        #origin line number in file
+        self.originLineNumber = {}
+        #re get pattern
+        translatePattern = config.getPattern("TranslatePattern")
+        ignorePattern = config.getPattern("IgnorePattern")
+        self.obtain = re.compile(translatePattern)
+        self.ignore = re.compile(ignorePattern, re.U)
 
     def setAddress(self, address):
         self.address = address
@@ -39,6 +45,7 @@ class ErbFileManager:
         try:
             file = open(address, "r", encoding='utf_8_sig')
             self.content = file.readlines()
+            self.originLineNumber.clear()
         except:
             file.close()
             file = open(address, "r", encoding='Shift-JIS')
@@ -49,6 +56,55 @@ class ErbFileManager:
         if self.content:
             self.content[0] = self.content[0].strip('\ufeff')
         return self.content
+        
+    #get sentence from file
+    def getSentence(self):
+        textDict = {}
+        for i in range(len(self.content)):
+            text = self.obtain.search(self.content[i])
+            if not text:
+                continue
+
+            text = list(filter(None, text.groups()))[0].strip()
+            # print("text", text)
+            if self.hasMark(i) or self.ignore.search(self.content[i]) == None:
+                #check translated info
+                nextList = []
+                if i < len(self.content) - 1:
+                    nextList = self.content[i + 1].strip().split(' ')
+                # print("nextList", nextList)
+                translated = ""
+                if self.mark in nextList:
+                    translated = text
+                    origin = ' '.join(nextList[1:]).strip()
+                else:
+                    origin = text
+                # print("origin", origin)
+                # print("translated", translated)
+                #check dict existance
+                if origin not in self.originLineNumber:
+                    self.originLineNumber[origin] = []
+                self.originLineNumber[origin] += [i]
+
+                #add to translate list
+                textDict[origin] = translated
+        print("Total: ", len(textDict))
+        return textDict
+        
+    def saveFile(self, textDict):
+        for k in textDict:
+            #have content
+            if textDict[k] != '':
+                #translated text + mark + origin
+                trans = textDict[k]
+                #for multiple line have same content
+                for line in self.originLineNumber[k]:
+                    self.replaceContent(line, k, trans)
+            #replace with origin text
+            else:
+                for line in self.originLineNumber[k]:
+                    self.replaceContent(line, k, "")
+        self.writeFile()
         
     def writeFile(self, address = None):
         if not address:
@@ -93,38 +149,51 @@ class ErbFileManager:
         print(res)
         return res
 
-    def replaceContent(self, lineNumber, origin, trans):
-        def hasMark():
-            if lineNumber + 1 < len(self.content):
-                text = self.content[lineNumber + 1].strip()
-                return text.startswith(self.mark)
-            return False
+    def hasMark(self, lineNumber):
+        if lineNumber + 1 < len(self.content):
+            text = self.content[lineNumber + 1].strip()
+            return text.startswith(self.mark)
+        return False
 
+    def replaceContent(self, lineNumber, origin, trans):
         text = self.content[lineNumber]
-        nextMark = hasMark()
+        nextMark = self.hasMark(lineNumber)
 
         #split with space, to handle exist translate part
         if origin not in self.content[lineNumber] \
             and (nextMark and origin not in self.content[lineNumber + 1]):
             raise ValueError("Error: {} not found in line {}".format(origin, lineNumber))
         
-        index = text.find("PRINT")
-        if index < 0:
-            index = text.find("DATA")
-        space = text[:index]
-        printIndex = text.find(' ', index)
-        backup = ''
-        if origin != trans:
+        emptylength = len(text) - len(text.lstrip())
+        space = text[:emptylength]
+        if trans != "":
             backup = ''.join([space, self.mark, ' ', origin, '\n'])
+            
+            result = self.obtain.search(self.content[lineNumber]).groups()
+            result = next((x for x in result if x is not None), None)
+            # print(result, trans)
+            
+            if result == None or result == trans:
+                return
+                
+            self.content[lineNumber] = self.content[lineNumber].split('\n')[0]
+            self.content[lineNumber] = self.content[lineNumber].replace(result, trans) + '\n'
+                    
+            # print([self.content[lineNumber]])
+            
             #has mark
             if nextMark:
                 self.content[lineNumber + 1] = backup
-                self.content[lineNumber] = ''.join([text[:printIndex], ' ', trans, '\n'])
             else:
-                self.content[lineNumber] = ''.join([text[:printIndex], ' ', trans, '\n', backup])
+                self.content[lineNumber] += backup
         #delete translation
         else:
-            self.content[lineNumber] = ''.join([text[:printIndex], ' ', origin, '\n'])
+            result = self.obtain.search(self.content[lineNumber]).groups()
+            result = next((x for x in result if x is not None), None)
+            if result != None and result != origin:
+                self.content[lineNumber] = self.content[lineNumber].split('\n')[0]
+                self.content[lineNumber] = self.content[lineNumber].replace(result, origin) + '\n'
+                
             if nextMark:
                 self.content[lineNumber + 1] = "removed"
 

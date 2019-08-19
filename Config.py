@@ -5,7 +5,12 @@ class Config:
     config = None
     def __init__(self):
         self.config = configparser.RawConfigParser()
-        self.config.read("config.ini", encoding="utf_8_sig")
+        try:
+            self.config.read("config.ini", encoding="utf_8_sig")
+        except:
+            print("Config Not Found")
+            input()
+            exit()
         if not self.config.sections():
             raise ValueError("No config file or file is empty.")
 
@@ -37,7 +42,7 @@ def test(section, text):
     print(element)
     res = testPattern.search(text)
     if res:
-        print(res.group(*range(element +1)))
+        print(res.group(*range(1, element +1)))
 
 if __name__ == '__main__':
     #con = Config()
@@ -49,8 +54,8 @@ if __name__ == '__main__':
     # a = "DATAFORM ……　どうしますか？"
     # test(section, a)
 
-    section = "NamePattern"
+    section = "SplitPattern"
     # print(config.items(section))
     # a = "「ほんと、やらしいんだから……\@ COND('発情期') && BASE:欲求不満 >= 50 ? ♪ # \@ことも」"
-    a = "%CALLNAME:ARG%は%NAME(0)%に膝枕をしている。"
+    a = "\@(L_CHARA_前 > -1) ? [1001]之前的角色# %\" \" * 16%\@"
     test(section, a)
