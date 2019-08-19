@@ -54,8 +54,8 @@ if __name__ == '__main__':
     # a = "DATAFORM ……　どうしますか？"
     # test(section, a)
 
-    section = "SplitPattern"
+    section = "IgnorePattern"
     # print(config.items(section))
     # a = "「ほんと、やらしいんだから……\@ COND('発情期') && BASE:欲求不満 >= 50 ? ♪ # \@ことも」"
-    a = "\@(L_CHARA_前 > -1) ? [1001]之前的角色# %\" \" * 16%\@"
+    a = "＜%NAME_SPEXP%＞"
     test(section, a)

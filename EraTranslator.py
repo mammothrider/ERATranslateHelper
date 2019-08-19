@@ -79,7 +79,7 @@ class EraTranslator:
                     res.extend(sub)
                 else:
                     res.append(tmp)
-        print("splitSentence", res)
+        # print("splitSentence", res)
         return res
 
     def removeFormatName(self, text):
@@ -129,6 +129,7 @@ class EraTranslator:
         #real percentage mark
         if '%' in translated:
             translated = translated.replace('%', '\%')
+        # translated.translate(str.maketrans("《》", "<>"))
         
         # print(translated, substring)
         # print(self.waitingQueue)
@@ -154,10 +155,9 @@ class EraTranslator:
             translated = translated.replace(k, mapping[k])
             
         for key in self.finalReplacement:
-            result = self.finalReplacement[key].sub(key, translated)
+            translated = self.finalReplacement[key].sub(key, translated)
             
         if not self.waitingQueue[origin]["mapping"]:
-        # print(translated, self.waitingQueue[origin]["recall"])
             self.waitingQueue[origin]["recall"](translated)
         
     
@@ -205,8 +205,8 @@ if __name__ == '__main__':
     # text = "%CALLNAME:ARG%は%NAME(0)%に膝枕をしている。"
     # text = "\@(L_CHARA_次 > -1) ? [1003]下一个角色# %\" \" * 16%\@"
     # text = "%\"同行中本人からお誘いあり\"%"
-    # text = "「承知致しました。一緒に行きましょう。」"
-    text = "%TEXTR(\"ほんと/やらしいんだから\")%"
+    text = "「承知致しました。一緒に行きましょう。」"
+    # text = "%TEXTR(\"ほんと/やらしいんだから\")%"
     # text, mapping = a.removeFormatName(text)
     # print(text, mapping)
     # text = a.recoverFormatName(text, mapping)
