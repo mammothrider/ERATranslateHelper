@@ -11,11 +11,13 @@ class EraTranslator:
         self.matchingQueue = {}
     
         splitPattern = config.getPattern("SplitPattern")
+        subSplitPattern = config.getPattern("SubSplitPattern")
         namePattern = config.getPattern("NamePattern")
         placePattern = config.getPattern("PlacePattern")
         numberPattern = config.getPattern("NumberPattern")
         ignorePattern = config.getPattern("IgnorePattern")
         self.splitFormat = re.compile(splitPattern)
+        self.subSplitFormat = re.compile(subSplitPattern)
         self.nameFormat = re.compile(namePattern)
         self.placeFormat = re.compile(placePattern)
         self.numberFormat = re.compile(numberPattern)
@@ -72,8 +74,12 @@ class EraTranslator:
         for i in result.group(*range(1, self.splitFormat.groups + 1)):
             if i and self.ignoreFormat.search(i) == None:
                 tmp = i.strip(" 「」")
-                res.append(tmp)
-        # print("splitSentence", res)
+                sub = self.subSplitFormat.findall(tmp)
+                if len(sub) > 0:
+                    res.extend(sub)
+                else:
+                    res.append(tmp)
+        print("splitSentence", res)
         return res
 
     def removeFormatName(self, text):
