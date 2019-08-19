@@ -112,12 +112,12 @@ class Editor(tk.Frame):
         self.webTranslate.insert(1.0, text)
 
     def copyButton(self):
-        text = self.origin.get(1.0, tk.END).strip("\n\r")
+        text = self.origin.get(1.0, tk.END).strip()
         self.web.delete(1.0, tk.END)
         self.web.insert(tk.END, text)
 
     def translateButton(self):
-        self.core.translate(self.web.get(1.0, tk.END).strip("\n\r"), self.setWebTranslatedText)
+        self.core.translate(self.web.get(1.0, tk.END).strip(), self.setWebTranslatedText)
 
     def previousItem(self):
         index = self.master.getOriginPosition(self.origin.get(1.0, tk.END).strip())

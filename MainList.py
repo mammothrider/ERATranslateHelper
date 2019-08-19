@@ -245,8 +245,9 @@ class MainList(tk.Frame):
     def setTranslation(self, position, sentence):
         self.translateList.insert(position, sentence)
         self.translateList.delete(position + 1)
-
+        
     def moveToItem(self, index):
+        # print("moveToItem", index)
         if index != None and index > -1 and index < self.originList.size():
             #clear selection
             self.originList.selection_clear(0, 'end')
