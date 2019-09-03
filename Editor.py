@@ -64,19 +64,28 @@ class Editor(tk.Frame):
         
         webFrame.rowconfigure(0, weight = 1)
         webFrame.rowconfigure(1, weight = 1)
+        webFrame.rowconfigure(2, weight = 1)
+        webFrame.rowconfigure(3, weight = 1)
+        webFrame.rowconfigure(4, weight = 1)
+        webFrame.rowconfigure(5, weight = 1)
+        
+        webFrame.columnconfigure(0, weight = 0)
         webFrame.columnconfigure(1, weight = 1)
 
-        copy = tk.Button(webFrame, text = '复制原文', height = 2, width = 7, command = self.copyButton)
-        copy.grid(row = 0, column = 0, ipadx = 10, padx = 10)
+        copy = tk.Button(webFrame, text = '复制', height = 2, width = 7, command = self.copyButton)
+        copy.grid(row = 0, rowspan = 2, column = 0, ipadx = 10, padx = 10)
 
         trans = tk.Button(webFrame, text = '翻译', height = 2, width = 7, command = self.translateButton)
-        trans.grid(row = 1, column = 0, ipadx = 10, padx = 10)
+        trans.grid(row = 2, rowspan = 2, column = 0, ipadx = 10, padx = 10)
         
-        self.web = tk.Text(webFrame, height = 3, width = 10)
-        self.web.grid(row = 0, rowspan = 1, column = 1, sticky=tk.N+tk.E+tk.S+tk.W)
+        paste = tk.Button(webFrame, text = '粘贴', height = 2, width = 7, command = self.pasteButton)
+        paste.grid(row = 4, rowspan = 2, column = 0, ipadx = 10, padx = 10)
 
-        self.webTranslate = tk.Text(webFrame, height = 3, width = 10)
-        self.webTranslate.grid(row = 1, column = 1, sticky=tk.N+tk.E+tk.S+tk.W)
+        self.web = tk.Text(webFrame, height = 2)
+        self.web.grid(row = 0, rowspan = 3, column = 2, sticky=tk.N+tk.E+tk.S+tk.W)
+
+        self.webTranslate = tk.Text(webFrame, height = 2)
+        self.webTranslate.grid(row = 3, rowspan = 3, column = 2, sticky=tk.N+tk.E+tk.S+tk.W)
         
         #webScroll = AutoScrollbar(webFrame, command = self.web.yview)
         #webScroll.grid(row = 0, rowspan = 2, column = 2, sticky=tk.N+tk.E+tk.S+tk.W)
@@ -99,35 +108,45 @@ class Editor(tk.Frame):
 
     def setOriginText(self, text):
         self.origin.config(state=tk.NORMAL)
-        self.origin.delete(1.0, tk.END)
+        self.origin.delete('1.0', tk.END)
         self.origin.insert(tk.END, text)
         self.origin.config(state=tk.DISABLED)
 
     def setTranslatedText(self, text):
-        self.translate.delete(1.0, tk.END)
-        self.translate.insert(1.0, text)
+        self.translate.delete('1.0', tk.END)
+        self.translate.insert('1.0', text)
 
     def setWebTranslatedText(self, text):
-        self.webTranslate.delete(1.0, tk.END)
-        self.webTranslate.insert(1.0, text)
+        self.webTranslate.delete('1.0', tk.END)
+        self.webTranslate.insert('1.0', text)
 
     def copyButton(self):
-        text = self.origin.get(1.0, tk.END).strip()
-        self.web.delete(1.0, tk.END)
+        text = self.origin.get('1.0', tk.END).strip()
+        self.web.delete('1.0', tk.END)
         self.web.insert(tk.END, text)
 
     def translateButton(self):
-        self.core.translate(self.web.get(1.0, tk.END).strip(), self.setWebTranslatedText)
+        self.core.translate(self.web.get('1.0', tk.END).strip(), self.setWebTranslatedText)
+        
+    def pasteButton(self):
+        text = self.webTranslate.get('1.0', tk.END).strip()
+        self.translate.delete('1.0', tk.END)
+        self.translate.insert(tk.END, text)
 
     def previousItem(self):
-        index = self.master.getOriginPosition(self.origin.get(1.0, tk.END).strip())
+        index = self.master.getOriginPosition(self.origin.get('1.0', tk.END).strip())
         self.master.movePreviousItem(index)
 
     def nextItem(self):
-        index = self.master.getOriginPosition(self.origin.get(1.0, tk.END).strip())
+        index = self.master.getOriginPosition(self.origin.get('1.0', tk.END).strip())
         self.master.moveNextItem(index)
 
     def saveTranslated(self):
-        self.core.setTranslatedText(self.origin.get(1.0, tk.END).strip(), self.translate.get(1.0, tk.END).strip())
-        self.master.setTranslation(self.master.getOriginPosition(self.origin.get(1.0, tk.END).strip()), \
-                                self.translate.get(1.0, tk.END).strip())
+        self.core.setTranslatedText(self.origin.get('1.0', tk.END).strip(), self.translate.get('1.0', tk.END).strip())
+        self.master.setTranslation(self.master.getOriginPosition(self.origin.get('1.0', tk.END).strip()), \
+                                self.translate.get('1.0', tk.END).strip())
+                                
+if __name__ == '__main__':
+    tkRoot = tk.Tk()
+    app = Editor(master = tkRoot)
+    app.mainloop()
