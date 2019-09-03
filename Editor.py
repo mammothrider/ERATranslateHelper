@@ -72,13 +72,13 @@ class Editor(tk.Frame):
         webFrame.columnconfigure(0, weight = 0)
         webFrame.columnconfigure(1, weight = 1)
 
-        copy = tk.Button(webFrame, text = '复制', height = 2, width = 7, command = self.copyButton)
+        copy = tk.Button(webFrame, text = '复制原文', height = 2, width = 7, command = self.copyButton)
         copy.grid(row = 0, rowspan = 2, column = 0, ipadx = 10, padx = 10)
 
         trans = tk.Button(webFrame, text = '翻译', height = 2, width = 7, command = self.translateButton)
         trans.grid(row = 2, rowspan = 2, column = 0, ipadx = 10, padx = 10)
         
-        paste = tk.Button(webFrame, text = '粘贴', height = 2, width = 7, command = self.pasteButton)
+        paste = tk.Button(webFrame, text = '复制译文', height = 2, width = 7, command = self.pasteButton)
         paste.grid(row = 4, rowspan = 2, column = 0, ipadx = 10, padx = 10)
 
         self.web = tk.Text(webFrame, height = 2)

@@ -5,14 +5,11 @@ class Config:
     config = None
     def __init__(self):
         self.config = configparser.RawConfigParser()
-        try:
-            self.config.read("config.ini", encoding="utf_8_sig")
-        except:
-            print("Config Not Found")
-            input()
-            exit()
+        self.config.read("config.ini", encoding="utf_8_sig")
         if not self.config.sections():
-            raise ValueError("No config file or file is empty.")
+            print("缺少Config.ini文件")
+            input("按任意键退出")
+            exit()
 
     def get(self, section, key):
         return self.config.get(section, key)
@@ -54,8 +51,8 @@ if __name__ == '__main__':
     # a = "DATAFORM ……　どうしますか？"
     # test(section, a)
 
-    section = "IgnorePattern"
+    section = "TranslatePattern"
     # print(config.items(section))
     # a = "「ほんと、やらしいんだから……\@ COND('発情期') && BASE:欲求不満 >= 50 ? ♪ # \@ことも」"
-    a = "＜%NAME_SPEXP%＞"
+    a = 'CALL KPRINT, 0, "L", 0, "『アレ』を召喚してみたい"'
     test(section, a)
