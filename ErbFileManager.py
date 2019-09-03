@@ -169,7 +169,11 @@ class ErbFileManager:
         if trans != "":
             backup = ''.join([space, self.mark, ' ', origin, '\n'])
             
-            result = self.obtain.search(self.content[lineNumber]).groups()
+            result = self.obtain.search(self.content[lineNumber])
+            if result == None:
+                return
+                
+            result = result.groups()
             result = next((x for x in result if x is not None), None)
             # print(result, trans)
             
@@ -188,7 +192,11 @@ class ErbFileManager:
                 self.content[lineNumber] += backup
         #delete translation
         else:
-            result = self.obtain.search(self.content[lineNumber]).groups()
+            result = self.obtain.search(self.content[lineNumber])
+            if result == None:
+                return
+                
+            result = result.groups()
             result = next((x for x in result if x is not None), None)
             if result != None and result != origin:
                 self.content[lineNumber] = self.content[lineNumber].split('\n')[0]

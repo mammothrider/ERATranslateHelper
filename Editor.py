@@ -81,7 +81,7 @@ class Editor(tk.Frame):
         paste = tk.Button(webFrame, text = '复制译文', height = 2, width = 7, command = self.pasteButton)
         paste.grid(row = 4, rowspan = 2, column = 0, ipadx = 10, padx = 10)
 
-        self.web = tk.Text(webFrame, height = 2)
+        self.web = tk.Text(webFrame, height = 2, width = 2000)
         self.web.grid(row = 0, rowspan = 3, column = 2, sticky=tk.N+tk.E+tk.S+tk.W)
 
         self.webTranslate = tk.Text(webFrame, height = 2)

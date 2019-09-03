@@ -1,5 +1,6 @@
 import tkinter as tk
 from functools import partial
+from Config import config
 class AutoTranslate():
     """the translate window"""
     def __init__(self, master, core = None):
@@ -38,7 +39,7 @@ class AutoTranslate():
         cooldownLable.grid(row = 0, column = 0, sticky=tk.E)
 
         self.cooldownTimeText = tk.Entry (settingFrame, **entrySetting)
-        self.cooldownTimeText.insert(tk.END, '2')
+        self.cooldownTimeText.insert(tk.END, config.get("TranslatorSettings", "translateGap"))
         self.cooldownTimeText.grid(row = 0, column = 1)
         
         retryTimeLable = tk.Label(settingFrame, text = '重试时间:', **labelSetting)
