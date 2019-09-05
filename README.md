@@ -44,3 +44,17 @@ TODO：
 2、全文件翻译。
 3、原文窗口
 可以自定义需要翻译的字符串，使用正则表达式
+
+
+Total:  35
+Total:  17
+Exception in Tkinter callback
+Traceback (most recent call last):
+  File "tkinter\__init__.py", line 1705, in __call__
+  File "MainList.py", line 151, in saveButton
+  File "Application.py", line 46, in saveFile
+  File "ErbFileManager.py", line 102, in saveFile
+  File "ErbFileManager.py", line 159, in replaceContent
+IndexError: list index out of range
+Total:  35
+Total:  17

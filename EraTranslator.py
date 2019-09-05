@@ -3,6 +3,7 @@ from BaiduAPITranslator import *
 from Config import config
 import re
 from functools import partial
+import traceback
 
 #main program
 class EraTranslator:
@@ -138,10 +139,17 @@ class EraTranslator:
         # print(translated, substring)
         # print("recoverFormatName", self.waitingQueue)
         
+        #sometimes substring not in mapping.
+        #why? race condition?
+        if substring not in self.waitingQueue[origin]["mapping"]:
+            return
+        
         try:
             mapping = self.waitingQueue[origin]["mapping"].pop(substring)
-        except Exception as e:
-            print("Recover Format Name", e)
+        except Exception as error:
+            print("Recover Format Name Error")
+            print(substring, self.waitingQueue[origin])
+            traceback.print_exc()
             mapping = {}
             
         for k in mapping:
@@ -164,6 +172,7 @@ class EraTranslator:
         #final return
         if not self.waitingQueue[origin]["mapping"]:
             self.waitingQueue[origin]["recall"](translated)
+            self.waitingQueue.pop(origin, None)
         
     
     def translate(self, text, updateMethod):
@@ -177,6 +186,10 @@ class EraTranslator:
             text = self.insideOut(text)
         origin = text
         # print("origin", origin)
+        
+        #duplicate?
+        if origin in self.waitingQueue:
+            return
         
         #origin: {result:{sub:result}, mapping:{sub:map}, recall:}
         self.waitingQueue[origin] = {}

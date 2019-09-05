@@ -47,11 +47,17 @@ class ErbFileManager:
             self.content = file.readlines()
             self.originLineNumber.clear()
         except:
-            file.close()
-            file = open(address, "r", encoding='Shift-JIS')
-            self.content = file.readlines()
+            try:
+                file.close()
+                file = open(address, "r", encoding='Shift-JIS')
+                self.content = file.readlines()
+            except:
+                print("Can't Open File", address)
+                file.close()
+                return []
         
-        #self.getSentence(self.content)
+        print("Open File", address)
+
         file.close()
         if self.content:
             self.content[0] = self.content[0].strip('\ufeff')
@@ -116,6 +122,7 @@ class ErbFileManager:
             for line in self.content:
                 if line != "removed":
                     file.write(line)
+            print("File Saved", address)
 
     def saveDictionary(self, translated):
         if not self.address:
