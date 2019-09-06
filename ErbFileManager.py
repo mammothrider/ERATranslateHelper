@@ -16,11 +16,17 @@ class ErbFileManager:
         self.ignore = re.compile(ignorePattern, re.U)
 
     def openFile(self, address):
-        with open(address, "r", encoding='utf_8_sig') as file:
-            return file.readlines()
-            
-        with open(address, "r", encoding='Shift-JIS') as file:
-            return file.readlines()
+        try:
+            with open(address, "r", encoding='utf_8_sig') as file:
+                return file.readlines()
+        except:
+            print("utf_8_sig can't decode file.")
+        
+        try:
+            with open(address, "r", encoding='Shift-JIS') as file:
+                return file.readlines()
+        except:
+            print("Shift-JIS can't decode file.")
         
         print("Unknown Codec")
         return []
@@ -45,7 +51,7 @@ class ErbFileManager:
             #join name and address
             newDir = os.path.join(address,s)     
             if os.path.isfile(newDir):
-                content = self.openFile()
+                content = self.openFile(newDir)
                 self.writeFile(newDir, content)
             else:
                 self.encodeFolder(newDir)
