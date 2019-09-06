@@ -24,7 +24,9 @@ class EraTranslator:
         self.numberFormat = re.compile(numberPattern)
         self.ignoreFormat = re.compile(ignorePattern, re.U)
         
-        self.stripMark = config.get("StripMark", "value")
+        stripMark = config.get("StripMark", "value")
+        stripMark = '^{0}+|{0}+$'.format(stripMark)
+        self.stripFormat = re.compile(stripMark)
         
         finalReplacePattern = config.items("ReplacePunctuation")
         self.finalReplacement = {}
@@ -184,20 +186,22 @@ class EraTranslator:
             
         if self.insideOutPattern.search(text) != None:
             text = self.insideOut(text)
-        origin = text
-        # print("origin", origin)
-        
+            
         #duplicate?
-        if origin in self.waitingQueue:
+        if text in self.waitingQueue:
             return
         
         #origin: {result:{sub:result}, mapping:{sub:map}, recall:}
-        self.waitingQueue[origin] = {}
-        self.waitingQueue[origin]["result"] = {}
-        self.waitingQueue[origin]["mapping"] = {}
-        self.waitingQueue[origin]["recall"] = updateMethod
+        self.waitingQueue[text] = {}
+        self.waitingQueue[text]["result"] = {}
+        self.waitingQueue[text]["mapping"] = {}
+        self.waitingQueue[text]["recall"] = updateMethod
         
-        group = self.splitSentence(origin.strip(self.stripMark))
+        origin = text
+        origin = self.stripFormat.sub("", origin)
+        
+        # group = self.splitSentence(origin.strip(self.stripMark))
+        group = self.splitSentence(origin)
         waitingList = []
         for sub in group:
             wait, mapping = self.removeFormatName(sub)
@@ -205,20 +209,20 @@ class EraTranslator:
             if not wait:
                 continue
                 
-            self.waitingQueue[origin]["mapping"][sub] = mapping
+            self.waitingQueue[text]["mapping"][sub] = mapping
             waitingList.append((wait, sub))
             
         # print("waitingList", waitingList)
         # print("waitingQueue", self.waitingQueue)
         #start after all finished
         for item in waitingList:
-            self.translator.addTranslate(item[0], partial(self.recoverFormatName, substring = item[1] , origin = origin))
+            self.translator.addTranslate(item[0], partial(self.recoverFormatName, substring = item[1] , origin = text))
             # self.recoverFormatName(item[0], item[1], origin)
             
     
 if __name__ == '__main__':
     a = EraTranslator()
-    text = "精液経験＋{S}(%CALLNAME:ASSI%)"
+    text = '"「んっ、んきゅ……_H_―――ぷぁっ。」_W"'
     # text, mapping = a.removeFormatName(text)
     # print(text, mapping)
     # text = a.recoverFormatName(text, mapping)
