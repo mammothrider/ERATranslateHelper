@@ -12,7 +12,7 @@ class Application:
         self.tkRoot = tk.Tk()
         self.core = core
         self.app = MainList(master = self.tkRoot, core = self)
-
+        
         #contains origin and translated sentence
         self.textDict = {}
 
@@ -38,8 +38,7 @@ class Application:
         #init
         self.textDict.clear()
 
-        self.erbFileManager.setAddress(address)
-        self.erbFileManager.readFile()
+        self.erbFileManager.readFile(address)
         self.textDict = self.erbFileManager.getSentence()
     
     def saveFile(self):

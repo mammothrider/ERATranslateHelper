@@ -7,19 +7,35 @@ class ErbFileManager:
         self.mark = config.get('mark', 'value')
         #origin line number in file
         self.originLineNumber = {}
+        self.content = []
+        self.address = None
         #re get pattern
         translatePattern = config.getPattern("TranslatePattern")
         ignorePattern = config.getPattern("IgnorePattern")
         self.obtain = re.compile(translatePattern)
         self.ignore = re.compile(ignorePattern, re.U)
 
-    def setAddress(self, address):
-        self.address = address
-    
-    def encodeFolder(self, address = None):
-        if address is None:
-            address = self.address
+    def openFile(self, address):
+        with open(address, "r", encoding='utf_8_sig') as file:
+            return file.readlines()
+            
+        with open(address, "r", encoding='Shift-JIS') as file:
+            return file.readlines()
+        
+        print("Unknown Codec")
+        return []
+        
+    def writeFile(self, address, content):
+        if not address:
+            raise ValueError("address is None")
+            
+        with open(address, "w", encoding='utf_8_sig') as file:
+            for line in content:
+                if line != "removed":
+                    file.write(line)
+            print("File Saved", address)
 
+    def encodeFolder(self, address = None):
         if address is None:
             raise ValueError("No Address!")
 
@@ -29,36 +45,22 @@ class ErbFileManager:
             #join name and address
             newDir = os.path.join(address,s)     
             if os.path.isfile(newDir):
-                self.readFile(newDir)
-                self.writeFile(newDir)
+                content = self.openFile()
+                self.writeFile(newDir, content)
             else:
                 self.encodeFolder(newDir)
 
 
     def readFile(self, address = None):
         if address is None:
-            address = self.address
-
-        if address is None:
             raise ValueError("No Address!")
         
-        try:
-            file = open(address, "r", encoding='utf_8_sig')
-            self.content = file.readlines()
-            self.originLineNumber.clear()
-        except:
-            try:
-                file.close()
-                file = open(address, "r", encoding='Shift-JIS')
-                self.content = file.readlines()
-            except:
-                print("Can't Open File", address)
-                file.close()
-                return []
+        self.address = address
+        self.content = self.openFile(address)
+        self.originLineNumber.clear()
         
         print("Open File", address)
 
-        file.close()
         if self.content:
             self.content[0] = self.content[0].strip('\ufeff')
         return self.content
@@ -99,30 +101,11 @@ class ErbFileManager:
         
     def saveFile(self, textDict):
         for k in textDict:
-            #have content
-            if textDict[k] != '':
-                #translated text + mark + origin
-                trans = textDict[k]
-                #for multiple line have same content
-                for line in self.originLineNumber[k]:
-                    self.replaceContent(line, k, trans)
-            #replace with origin text
-            else:
-                for line in self.originLineNumber[k]:
-                    self.replaceContent(line, k, "")
-        self.writeFile()
-        
-    def writeFile(self, address = None):
-        if not address:
-            address = self.address
-        if not address:
-            raise ValueError("address is None")
-            
-        with open(address, "w", encoding='utf_8_sig') as file:
-            for line in self.content:
-                if line != "removed":
-                    file.write(line)
-            print("File Saved", address)
+            #for multiple line have same content
+            for line in self.originLineNumber[k]:
+                self.replaceContent(line, k, textDict[k])
+                    
+        self.writeFile(self.address, self.content)
 
     def saveDictionary(self, translated):
         if not self.address:
@@ -163,6 +146,13 @@ class ErbFileManager:
         return False
 
     def replaceContent(self, lineNumber, origin, trans):
+        if lineNumber >= len(self.content):
+            print("Replace Content Error:")
+            print("Line Number:", lineNumber)
+            print("File Address:", self.address)
+            print("Origin:", origin)
+            return
+            
         text = self.content[lineNumber]
         nextMark = self.hasMark(lineNumber)
 
@@ -215,6 +205,5 @@ class ErbFileManager:
 if __name__ == '__main__':
     a = ErbFileManager()
     add = r"COMF400.ERB"
-    a.setAddress(add)
-    a.openFile()
+    a.openFile(add)
     print(a.content)
