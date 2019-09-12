@@ -5,6 +5,8 @@ import re
 from functools import partial
 import traceback
 
+DEBUG = False
+
 #main program
 class EraTranslator:
     def __init__(self):
@@ -51,7 +53,7 @@ class EraTranslator:
         #re related
         self.percentString = re.compile("%[^%]*%")
         #have target text between %%
-        self.insideOutPattern = re.compile("%[^%]*\"[^%]*\"[^%^\*]*%")
+        self.insideOutPattern = re.compile("%[^%]*\"[^%]*\"[^%^\*^\)]*%")
 
     
     def insideOut(self, text):
@@ -68,7 +70,8 @@ class EraTranslator:
         return self.markCounter
 
     def splitSentence(self, text):
-        # print("splitSentence input", [text])
+        if DEBUG:
+            print("splitSentence input", [text])
         result = self.splitFormat.search(text)
         
         #nothing match
@@ -78,13 +81,16 @@ class EraTranslator:
         res = []
         for i in result.group(*range(1, self.splitFormat.groups + 1)):
             if i and self.ignoreFormat.search(i) == None:
-                tmp = i.strip(" 「」")
-                sub = self.subSplitFormat.findall(tmp)
-                if len(sub) > 0:
-                    res.extend(sub)
-                else:
-                    res.append(tmp)
-        # print("splitSentence", res)
+                tmp = self.stripFormat.sub("", i)
+                tmplist = self.splitSentence(tmp)
+                for t in tmplist:
+                    sub = self.subSplitFormat.findall(t)
+                    if len(sub) > 0:
+                        res.extend(sub)
+                    else:
+                        res.append(t)
+        if DEBUG:
+            print("splitSentence", res)
         return res
 
     def removeFormatName(self, text):
@@ -199,33 +205,40 @@ class EraTranslator:
         
         origin = text
         origin = self.stripFormat.sub("", origin)
+        if DEBUG:
+            print("Origin", origin)
         
         # group = self.splitSentence(origin.strip(self.stripMark))
         group = self.splitSentence(origin)
+        if DEBUG:
+            print("Group", group)
         waitingList = []
         for sub in group:
             wait, mapping = self.removeFormatName(sub)
-            # print("removeFormatName", wait, mapping)
+            if DEBUG:
+                print("removeFormatName", wait, mapping)
             if not wait:
                 continue
                 
             self.waitingQueue[text]["mapping"][sub] = mapping
             waitingList.append((wait, sub))
             
-        # print("waitingList", waitingList)
-        # print("waitingQueue", self.waitingQueue)
+        if DEBUG:
+            print("waitingList", waitingList)
+            print("waitingQueue", self.waitingQueue)
         #start after all finished
         for item in waitingList:
-            self.translator.addTranslate(item[0], partial(self.recoverFormatName, substring = item[1] , origin = text))
+            if not DEBUG:
+                self.translator.addTranslate(item[0], partial(self.recoverFormatName, substring = item[1] , origin = text))
             # self.recoverFormatName(item[0], item[1], origin)
             
     
 if __name__ == '__main__':
     a = EraTranslator()
-    text = '"「んっ、んきゅ……_H_―――ぷぁっ。」_W"'
+    text = '"・_緑_%TEXTS("助手の名称")%"'
     # text, mapping = a.removeFormatName(text)
     # print(text, mapping)
     # text = a.recoverFormatName(text, mapping)
     # print(text)
     a.translate(text, print)
-    time.sleep(10)
+    time.sleep(20)
