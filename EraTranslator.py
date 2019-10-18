@@ -38,7 +38,7 @@ class EraTranslator:
         self.name = ["灵梦", "魔理沙", "八云紫", "红美玲", "AA", "BB", "CC"]
         self.place = ["正門", "納屋", "大浴場"]
         self.placeFind = ["正门", "仓库", "大浴场"]
-        self.itemReplace = ["AA", "BB", "CC", "DD", "EE"]
+        self.itemReplace = ["苹果", "橘子", "香蕉", "鸭梨"]
 
         translator = config.get("Translator", "value")
         if translator == "BaiduAPI":
@@ -228,14 +228,13 @@ class EraTranslator:
             print("waitingQueue", self.waitingQueue)
         #start after all finished
         for item in waitingList:
-            if not DEBUG:
-                self.translator.addTranslate(item[0], partial(self.recoverFormatName, substring = item[1] , origin = text))
+            self.translator.addTranslate(item[0], partial(self.recoverFormatName, substring = item[1] , origin = text))
             # self.recoverFormatName(item[0], item[1], origin)
             
     
 if __name__ == '__main__':
     a = EraTranslator()
-    text = '"・_緑_%TEXTS("助手の名称")%"'
+    text = 'ほら小野寺くんっ、教えた通りに頑張って%CSTR:9%をイかせてみてっ%UNICODE(0x2665)%」'
     # text, mapping = a.removeFormatName(text)
     # print(text, mapping)
     # text = a.recoverFormatName(text, mapping)
