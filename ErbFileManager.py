@@ -117,11 +117,12 @@ class ErbFileManager:
         if not self.address:
             print("No File Selected")
             return
-
-        filename = os.path.basename(self.address)
+            
         folder = self.address.split("ERB")[0] + "dict/"
         if not os.path.exists(folder):
             os.makedirs(folder)
+            
+        filename = self.address.split("ERB")[1].replace("/", "_")
         filename = os.path.join(folder, filename.rsplit(".")[0] + "_dict.txt")
         print("保存字典文件：", filename)
         # addr, filename = os.path.split(self.address)
@@ -142,7 +143,6 @@ class ErbFileManager:
                 text = line.strip().split("\t")
                 if len(text) == 2:
                     res[text[0]] = text[1]
-        print(res)
         return res
 
     def hasMark(self, lineNumber):
