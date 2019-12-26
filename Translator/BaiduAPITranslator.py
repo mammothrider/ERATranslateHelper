@@ -3,7 +3,7 @@ import json
 from Config import config
 import time
 import hashlib
-from AbstractTranslator import *
+from Translator.AbstractTranslator import *
 
 class BaiduAPITranslator(AbstractTranslator):
     def __init__(self):

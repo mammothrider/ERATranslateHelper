@@ -1,7 +1,7 @@
 import tkinter as tk
 from ErbFileManager import *
 from EraTranslator import *
-from MainList import *
+from UI.MainList import *
 from Config import config
 
 #import pysnooper

@@ -1,5 +1,5 @@
-from BaiduTranslator import *
-from BaiduAPITranslator import *
+from Translator.BaiduTranslator import *
+from Translator.BaiduAPITranslator import *
 from Config import config
 import re
 from functools import partial

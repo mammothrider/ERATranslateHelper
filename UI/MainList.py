@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from tkExtensions import *
-from Editor import *
+from UI.tkExtensions import *
+from UI.Editor import *
 from ReplaceWindow import *
-from AutoTranslate import *
+from UI.AutoTranslate import *
 class MainList(tk.Frame):
     def __init__(self, master=None, core=None):
         super().__init__(master)

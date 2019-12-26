@@ -8,8 +8,7 @@ class Config:
         self.config.read("config.ini", encoding="utf_8_sig")
         if not self.config.sections():
             print("缺少Config.ini文件")
-            input("按任意键退出")
-            exit()
+            exit(1)
 
     def get(self, section, key):
         return self.config.get(section, key)
@@ -40,6 +39,9 @@ def test(section, text):
     res = testPattern.search(text)
     if res:
         print(res.group(*range(1, element +1)))
+        
+    # res = testPattern.findall(text)
+    # print(res)
 
 if __name__ == '__main__':
     #con = Config()
@@ -51,8 +53,8 @@ if __name__ == '__main__':
     # a = "DATAFORM ……　どうしますか？"
     # test(section, a)
 
-    section = "TranslatePattern"
+    section = "SplitPattern"
     # print(config.items(section))
     # a = "「ほんと、やらしいんだから……\@ COND('発情期') && BASE:欲求不満 >= 50 ? ♪ # \@ことも」"
-    a = 'CALL KPRINT, 0, "L", 0, "『アレ』を召喚してみたい"'
+    a = '%TEXTR("大きく肥大した/一目で視認できる程に大きな/小指の先ほどの大きさの")%%TEXTR("陰核/クリトリス/肉の豆")%'
     test(section, a)
