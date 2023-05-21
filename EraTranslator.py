@@ -1,5 +1,7 @@
 from Translator.BaiduTranslator import *
 from Translator.BaiduAPITranslator import *
+from Translator.OpenaiTranslator import *
+
 from Config import config
 import re
 from functools import partial
@@ -43,6 +45,8 @@ class EraTranslator:
         translator = config.get("Translator", "value")
         if translator == "BaiduAPI":
             self.translator = BaiduAPITranslator()
+        elif translator == "OpenAI":
+            self.translator = OpenAiTranslator()
         else:
             self.translator = BaiduTranslator()
 

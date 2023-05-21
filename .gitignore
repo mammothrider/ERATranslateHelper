@@ -18,3 +18,4 @@ editor.png
 main.png
 /*.ERB
 venv
+/env
